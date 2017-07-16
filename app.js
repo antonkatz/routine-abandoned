@@ -9,25 +9,39 @@ import {
   StyleSheet,
   Text,
   View,
+  ScrollView,
   Platform,
 } from 'react-native';
 import Schedule from './src/js/schedule.js'
+import Routines from './src/js/routines.js'
+import { StackNavigator } from 'react-navigation';
 
-export default class ExampleApp extends Component {
+class ExampleApp extends Component {
   render() {
     return (
-      <View style={styles.container}>
+      <ScrollView style={styles.container} contentContainerStyle={styles.innerContainer} horizontal={true}>
+        <Routines/>
         <Schedule/>
-      </View>
+      </ScrollView>
     );
   }
 }
 
+const SimpleApp = StackNavigator({
+  Home: { screen: ExampleApp },
+});
+
+AppRegistry.registerComponent('SimpleApp', () => SimpleApp);
+
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  innerContainer: {
     justifyContent: 'center',
     alignItems: 'center',
+    flexWrap: 'nowrap'
+  },
+  container: {
+    flex: 1,
     backgroundColor: '#F5FCFF',
   },
   welcome: {

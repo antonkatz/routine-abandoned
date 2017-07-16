@@ -23,7 +23,8 @@ export default class Schedule extends PureComponent {
 const styles = StyleSheet.create({
   container: {
     flexWrap: 'nowrap',
-    flexDirection: 'row'
+    flexDirection: 'row',
+    minHeight: '100%'
   },
   timeline: {
     marginRight: 10

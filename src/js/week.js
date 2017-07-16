@@ -24,7 +24,7 @@ export default class Week extends PureComponent {
     const dates = this.getDatesOfWeek();
     let first = true;
     return dates.map((d) => {
-      const rendering = <Day style={first ? style.firstDay : style.otherDays}/>;
+      const rendering = <Day style={first ? style.firstDay : null} key={d}/>;
       first = false;
       return (rendering)
     })
@@ -44,7 +44,6 @@ const style = StyleSheet.create({
     flexDirection: 'row'
   },
   firstDay: {
-    border: 'none'
-  },
-  otherDays: {}
+    borderLeftWidth: 0
+  }
 });

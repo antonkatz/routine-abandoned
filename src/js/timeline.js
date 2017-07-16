@@ -8,7 +8,7 @@ import {View, StyleSheet, Text} from "react-native";
 export default class TimeLine extends PureComponent {
   /** @return time interval in milliseconds between successive points on the line */
   getTimeInterval() {
-    return 30 * 60 * 1000;
+    return 60 * 60 * 1000;
   }
 
   getTimedDate(hour, minute) {
@@ -29,12 +29,13 @@ export default class TimeLine extends PureComponent {
 
   /** @returns array of time points at which to put markers */
   getTimePoints() {
-    const end = this.getEndTime().valueOf();
+    const end = this.getEndTime();
+    const end_value = end.valueOf();
     const points = [this.getStartTime()];
     let last = points[0].valueOf();
-    while(last < end) {
+    while(last < end_value) {
       const d = new Date(last + this.getTimeInterval());
-      points.push(d);
+      points.push(d.valueOf() > end_value ? end : d);
       last = d.valueOf();
     }
     return points;
@@ -42,11 +43,11 @@ export default class TimeLine extends PureComponent {
 
   renderTimePoints() {
     const points = this.getTimePoints()
-    return points.map((p) => {
+    return points.map((p, i) => {
       const minutes = p.getMinutes();
       const m = minutes < 10 ? '0' + minutes : minutes
       return (
-         <Text>
+         <Text key={i}>
            {p.getHours()}:{m}
          </Text>
       )
@@ -65,6 +66,7 @@ export default class TimeLine extends PureComponent {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column'
+    flexDirection: 'column',
+    justifyContent: 'space-between'
   }
 })
