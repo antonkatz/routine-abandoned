@@ -14,9 +14,8 @@ import {
 } from 'react-native';
 import Schedule from './src/js/schedule.js'
 import Routines from './src/js/routines.js'
-import { StackNavigator } from 'react-navigation';
 
-class ExampleApp extends Component {
+export default class ExampleApp extends Component {
   render() {
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.innerContainer} horizontal={true}>
@@ -26,13 +25,6 @@ class ExampleApp extends Component {
     );
   }
 }
-
-const SimpleApp = StackNavigator({
-  Home: { screen: ExampleApp },
-});
-
-AppRegistry.registerComponent('SimpleApp', () => SimpleApp);
-
 
 const styles = StyleSheet.create({
   innerContainer: {

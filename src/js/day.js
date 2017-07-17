@@ -23,6 +23,6 @@ const styles = StyleSheet.create({
     // backgroundColor: 'black',
     borderLeftWidth: 1,
     borderLeftColor: 'black',
-    borderLeftStyle: 'solid'
+    borderStyle: 'solid'
   }
 })
