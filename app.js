@@ -14,14 +14,22 @@ import {
 } from 'react-native';
 import Schedule from './src/js/schedule.js'
 import RoutineNav from './src/js/navigation/routinesnav'
+import { Provider } from 'react-redux'
+import { createStore } from 'redux'
+import {routineApp} from './src/js/redux/reducers'
+import {testData} from './src/js/redux/store'
+
+const store = createStore(routineApp, testData);
 
 export default class ExampleApp extends Component {
   render() {
     return (
-      <ScrollView style={styles.container} contentContainerStyle={styles.innerContainer} horizontal={true}>
-        <RoutineNav/>
-        <Schedule/>
-      </ScrollView>
+      <Provider store={store}>
+        <ScrollView style={styles.container} contentContainerStyle={styles.innerContainer} horizontal={true}>
+          <RoutineNav/>
+          <Schedule/>
+        </ScrollView>
+      </Provider>
     );
   }
 }
