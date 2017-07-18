@@ -13,13 +13,13 @@ import {
   Platform,
 } from 'react-native';
 import Schedule from './src/js/schedule.js'
-import Routines from './src/js/routines.js'
+import RoutineNav from './src/js/navigation/routinesnav'
 
 export default class ExampleApp extends Component {
   render() {
     return (
       <ScrollView style={styles.container} contentContainerStyle={styles.innerContainer} horizontal={true}>
-        <Routines/>
+        <RoutineNav/>
         <Schedule/>
       </ScrollView>
     );
