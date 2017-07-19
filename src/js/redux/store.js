@@ -1,9 +1,10 @@
+//@flow
 /**
  * Created by anton on 18/07/17.
  */
 
 export type Routine = {
-  +id: number, +title: string, +parent: number, +children: Array<number>
+  +id: number, +title: string, +parentId: ?number
 }
 
 export type State = {
@@ -11,7 +12,7 @@ export type State = {
 }
 
 export const testData: State = {
-  routines: [{id: 1, title: "routine test", parent: null, children: [2, 3]},
-    {id: 2, title: "rt ch 2", parent: 1, children: []},
-    {id: 3, title: "rt ch 3", parent: 1, children: []}],
+  routines: [{id: 1, title: "yoga", parentId: null},
+    {id: 2, title: "rt ch 2", parentId: 1},
+    {id: 3, title: "rt ch 3", parentId: 1}],
 }

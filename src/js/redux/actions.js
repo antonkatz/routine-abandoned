@@ -5,12 +5,12 @@
 
 const ADD_ROUTINE = 'ADD_ROUTINE';
 
-export type AddRoutineAction = {type: ADD_ROUTINE, title: string};
+export type AddRoutineAction = {type: 'ADD_ROUTINE', title: string, parentId: number};
 
 export type Action = AddRoutineAction
 
-function addRoutine(title: string): AddRoutineAction {
-  return {type: ADD_ROUTINE, title: title}
+function addRoutine(parentId: number, title: string): AddRoutineAction {
+  return {type: ADD_ROUTINE, title: title, parentId: parentId}
 }
 
 export {ADD_ROUTINE, addRoutine}

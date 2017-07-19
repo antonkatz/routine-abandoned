@@ -11,7 +11,7 @@ export default class CreateRoutine extends PureComponent {
   render() {
     return (
       <View>
-
+        this is a create routine view
       </View>
     )
   }
