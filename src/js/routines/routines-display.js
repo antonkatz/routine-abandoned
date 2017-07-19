@@ -4,11 +4,13 @@
 
 import React, {Component, PureComponent} from "react";
 import {ScrollView, View, StyleSheet, Text, Button} from "react-native";
-import {wrapWithLink, generateRoute} from '../navigation/helpers'
+// import {wrapWithLink, generateRoute} from '../navigation/helpers'
 import {State} from '../redux/store'
 import {addRoutine} from '../redux/actions'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
+import {Link} from '../navigation/nav-import'
+import {VIEW_ROUTINES_PATH} from '../navigation/constants'
 
 function getChildren(state: State, dirtyId) {
   const id: number = Number(dirtyId);
@@ -36,24 +38,26 @@ const mapDispatchToProps = dispatch => {
   }
 }
 
-const RoutinesList = (props) => {
+function displaySingleRoutine(r) {
   return (
-    <View>
-      {props.routineChildren.map((c) => {
-        return (
-          wrapWithLink(<Text>{c.title}</Text>, c.id, `/routine/${c.id}`)
-        )
-      })}
-    </View>
+    <Link key={r.id} to={`${VIEW_ROUTINES_PATH}${r.id}`}>
+    <Text>{r.title}</Text>
+  </Link>
   )
 }
+
+const displayRoutinesList = (routines) => {
+  return routines.map(displaySingleRoutine)
+};
 
 const Routines = (props) => {
     return (
         <View>
           <ScrollView style={styles.container} contentContainerStyle={styles.innerContainer}>
-            <Button title="add routine" onPress={() => props.onAddClick(props.parentId)}></Button>
-            <RoutinesList routineChildren={props.routineChildren}/>
+            {[
+              <Button key='button' title="add routine" onPress={() => props.onAddClick(props.parentId)}></Button>,
+              ...displayRoutinesList(props.routineChildren)
+            ]}
           </ScrollView>
         </View>
     )
