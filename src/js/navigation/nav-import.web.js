@@ -1,5 +1,5 @@
 //@flow
 
-import {BrowserRouter, Route, Link } from 'react-router-dom'
+import {MemoryRouter, Route, Link } from 'react-router-dom'
 
-export {BrowserRouter as Router, Route, Link}
+export {MemoryRouter as Router, Route, Link}

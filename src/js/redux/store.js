@@ -1,10 +1,18 @@
-//@flow
 /**
- * Created by anton on 18/07/17.
+ * @flow
  */
 
+import routineColors from '../routines/routine-colors'
+
 export type Routine = {
-  +id: number, +title: string, +parentId: ?number
+  +id: number, +title: string, +parentId: ?number, +color?: routineColors, +description?: string,
+  +goals: Goals
+}
+
+export type Goals = Array<Goal>
+
+export type Goal = {
+  daily: number, weekly: number
 }
 
 export type State = {

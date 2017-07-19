@@ -1,74 +1,54 @@
-/**
- * Managing routines and sub-routines (their prototypes, not actual events)
- */
+/** @flow */
 
 import React, {Component, PureComponent} from "react";
 import {ScrollView, View, StyleSheet, Text, Button} from "react-native";
-// import {wrapWithLink, generateRoute} from '../navigation/helpers'
-import {State} from '../redux/store'
-import {addRoutine} from '../redux/actions'
-import { connect } from 'react-redux'
-import { withRouter } from 'react-router-dom'
 import {Link} from '../navigation/nav-import'
 import {VIEW_ROUTINES_PATH} from '../navigation/constants'
+import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
+import Avatar from 'material-ui/Avatar';
+import {DEFAULT_ROUTINE_COLOR, getAvatarTextColor} from './routine-colors'
+import {Routine} from '../redux/store'
 
-function getChildren(state: State, dirtyId) {
-  const id: number = Number(dirtyId);
-  if (!id) {
-    return state.routines.filter((r) => {
-      return !r.parentId
-    })
-  }
-  return state.routines.filter((r) => {return r.parentId === id} );
-}
+/* notes:
+* - (?) only parentless routines can have color -- NOT IMPLEMENTED
+* */
 
-const mapStateToProps = (state: State, ownProps ) => {
-  console.log("map state to props", state, ownProps)
-  return {
-    parentId: Number(ownProps.match.params.id),
-    routineChildren: getChildren(state, ownProps.match.params.id)
-  }
-};
-
-const mapDispatchToProps = dispatch => {
-  return {
-    onAddClick: parentId => {
-      dispatch(addRoutine(parentId, "new routine"))
-    }
-  }
-}
-
-function displaySingleRoutine(r) {
+function displaySingleRoutine(r: Routine) {
+  const bgColor = r.color || DEFAULT_ROUTINE_COLOR;
   return (
-    <Link key={r.id} to={`${VIEW_ROUTINES_PATH}${r.id}`}>
-    <Text>{r.title}</Text>
-  </Link>
+    <Card>
+      <CardHeader title={r.title} actAsExpander showExpandableButton avatar={
+        <Avatar backgroundColor={bgColor} color={getAvatarTextColor(bgColor)}>
+          {r.title.length > 0 ? r.title.charAt(0) : ""}
+        </Avatar>
+      }/>
+    </Card>
+
+    // <Link key={r.id} to={`${VIEW_ROUTINES_PATH}${r.id}`}>
+    //  <Text>{r.title}</Text>
+    // </Link>
   )
 }
 
-const displayRoutinesList = (routines) => {
+function displayRoutinesList(routines) {
   return routines.map(displaySingleRoutine)
-};
+}
 
-const Routines = (props) => {
+export default function RoutinesDisplay(props) {
     return (
-        <View>
           <ScrollView style={styles.container} contentContainerStyle={styles.innerContainer}>
             {[
               <Button key='button' title="add routine" onPress={() => props.onAddClick(props.parentId)}></Button>,
               ...displayRoutinesList(props.routineChildren)
             ]}
           </ScrollView>
-        </View>
     )
 }
 
-export default ConnectedRoutines = connect(mapStateToProps, mapDispatchToProps)(Routines)
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    width: 200,
     // backgroundColor: 'black'
     // alignSelf: 'flex-start'
   },

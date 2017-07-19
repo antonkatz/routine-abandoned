@@ -6,11 +6,13 @@
 import React from "react";
 import {ScrollView, StyleSheet, Text, View} from "react-native";
 import Schedule from "./schedule";
-import RoutineNav from "./routines/routines-nav";
 import {VIEW_SCHEDULE_PATH} from "./navigation/constants";
 import {Link, Route, Router} from "./navigation/nav-import";
-import {OpenRoutines} from "./routines/routines-control";
+import {OpenRoutines} from "./routines/routines-controls";
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
+// import Routines from './routines/routines-bindings'
+import Routines from './routines/routines-bindings'
+import {VIEW_ROUTINES_PATH} from './navigation/constants'
 
 function TopMenu() {
   return (
@@ -20,20 +22,26 @@ function TopMenu() {
   )
 }
 
+function HomeScreen() {
+  return (
+    <View>
+      <TopMenu/>
+      <Schedule/>
+    </View>
+  )
+}
+
 export default function AppDisplay() {
   return (
     <MuiThemeProvider>
       <Router>
         <ScrollView style={styles.container} contentContainerStyle={styles.innerContainer}>
-          <TopMenu/>
-          <RoutineNav/>
-          <Route path={VIEW_SCHEDULE_PATH} exact={true} component={Schedule}/>
+          <Route path={`${VIEW_ROUTINES_PATH}:id?`} exact={false} component={Routines}/>
+          <Route path={VIEW_SCHEDULE_PATH} exact={true} component={HomeScreen}/>
         </ScrollView>
       </Router>
     </MuiThemeProvider>
   )
-
-  // return (<Text>other test</Text>)
 }
 
 const styles = StyleSheet.create({
