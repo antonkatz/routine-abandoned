@@ -19,16 +19,3 @@ const OpenRoutines = () => {
 }
 
 export {OpenRoutines}
-
-// import Drawer from 'material-ui/Drawer';
-//
-// const drawer = (props) => {
-//   return (
-//     <Drawer
-//       docked={false}
-//       width={200}
-//       open={this.state.open}
-//       onRequestChange={(open) => this.setState({open})}
-//     >
-//   )
-// }

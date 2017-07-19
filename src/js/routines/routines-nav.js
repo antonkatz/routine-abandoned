@@ -12,13 +12,4 @@ const RoutineNav = () => {
     </View>
   )
 }
-  //<Router>
-
-    // {/*<Route path="/routine/:id" children={ ({match}) =>*/}
-    //   {/*(*/}
-    //   {/*<Routines match={match ? match : {params: {id: null}} }/>*/}
-    //   {/*)*/}
-    // {/*}/>*/}
-  //</Router>
-
 export default RoutineNav
