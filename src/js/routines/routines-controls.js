@@ -7,6 +7,7 @@ import React from 'react';
 import RaisedButton from "material-ui/RaisedButton"
 import {Link} from '../navigation/nav-import'
 import {VIEW_ROUTINES_PATH} from '../navigation/constants'
+import type {Goal, Routine} from '../redux/store'
 
 const OpenRoutines = () => {
   return (
@@ -15,5 +16,10 @@ const OpenRoutines = () => {
   </Link>
   )
 }
+
+export const navigateToRoutineChildren = (routerHistory) => (r: Routine) => {
+  routerHistory.push(`${VIEW_ROUTINES_PATH}${r.id}`)
+}
+
 
 export {OpenRoutines}

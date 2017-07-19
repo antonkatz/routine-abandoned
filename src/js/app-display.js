@@ -13,6 +13,7 @@ import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
 // import Routines from './routines/routines-bindings'
 import Routines from './routines/routines-bindings'
 import {VIEW_ROUTINES_PATH} from './navigation/constants'
+import bgImage from '../images/seamless_paper_texture.png'
 
 function TopMenu() {
   return (
@@ -58,7 +59,8 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#F5FCFF',
+    // backgroundColor: '#F5FCFF',
+    backgroundImage: 'url('+ bgImage +')'
   },
   welcome: {
     fontSize: 20,
