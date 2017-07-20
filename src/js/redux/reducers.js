@@ -6,7 +6,7 @@
 import { combineReducers } from 'redux'
 import {ADD_ROUTINE} from "./actions";
 import type {Action, AddRoutineAction} from "./actions";
-import type {Routine} from './store'
+import type {Routine, Plan} from './store'
 
 const routines = (state: Array<Routine> = [], action: Action): Array<Routine> => {
   switch (action.type) {
@@ -19,7 +19,15 @@ const routines = (state: Array<Routine> = [], action: Action): Array<Routine> =>
   }
 }
 
-const routineApp = combineReducers({routines})
+const plans = (state: Array<Plan> = [], action: Action): Array<Routine> => {
+  switch (action.type) {
+    default:
+      (action: empty)
+      return state
+  }
+}
+
+const routineApp = combineReducers({routines, plans})
 
 
 export {routineApp}

@@ -16,6 +16,8 @@ import Subheader from 'material-ui/Subheader';
 
 /* notes:
 * - (?) only parentless routines can have color -- NOT IMPLEMENTED
+* - sub-routines are called "contents" ex. a routine "friends" can contain friend names that act as tasks, rather than
+ * a full blown routine
 * */
 
 function displaySingleRoutine(r: Routine, navigateDown) {

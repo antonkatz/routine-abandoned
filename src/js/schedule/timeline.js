@@ -1,11 +1,19 @@
 /**
  * The timeline on the side of the schedule
+ *
+ * - should have a zoom level
+ * - should have a view filter
+ * - should be able to nest itself in other timelines
+ * - should be able to collapse
+ *
+ * @flow
  */
 
 import React, {PureComponent} from "react";
 import {View, StyleSheet, Text} from "react-native";
 
 export default class TimeLine extends PureComponent {
+
   /** @return time interval in milliseconds between successive points on the line */
   getTimeInterval() {
     return 60 * 60 * 1000;
@@ -41,7 +49,7 @@ export default class TimeLine extends PureComponent {
     return points;
   }
 
-  renderTimePoints() {
+  renderTimeBins() {
     const points = this.getTimePoints()
     return points.map((p, i) => {
       const minutes = p.getMinutes();
@@ -57,7 +65,7 @@ export default class TimeLine extends PureComponent {
   render() {
     return (
        <View style={styles.container}>
-         {this.renderTimePoints()}
+         {this.renderTimeBins()}
        </View>
     )
   }

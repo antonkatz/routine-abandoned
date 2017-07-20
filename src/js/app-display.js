@@ -5,7 +5,7 @@
 
 import React from "react";
 import {ScrollView, StyleSheet, Text, View} from "react-native";
-import Schedule from "./schedule";
+import Schedule from "./schedule/schedule-data-logic";
 import {VIEW_SCHEDULE_PATH} from "./navigation/constants";
 import {Link, Route, Router} from "./navigation/nav-import";
 import {OpenRoutines} from "./routines/routines-controls";
