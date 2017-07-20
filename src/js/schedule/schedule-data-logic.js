@@ -13,6 +13,8 @@ function processStatePlansToEvents(plans: Array<Plan>, routineFinder: (id: numbe
     // each plan can have multiple repetitions
     return getDates(p).map(d => {
       const event: Event = {
+        id: '' + p.id + d.end.valueOf() + d.end.valueOf(),
+        parentPlanId: p.id,
         dateTimeStart: d.start,
         dateTimeEnd: d.end,
         duration: d.duration,

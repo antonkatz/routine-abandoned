@@ -24,7 +24,9 @@ function getEndTime(props) {
 
 function createFreeEvent(start: Date, end: Date) {
   const duration = Math.floor((end.valueOf() - start.valueOf()) / 1000 / 60)
-  return {dateTimeStart: start, dateTimeEnd: end, title: FREE_TIME_EVENT_TITLE,
+  return {
+    id: FREE_TIME_EVENT_TITLE + start.valueOf() + end.valueOf(), parentPlanId: null,
+    dateTimeStart: start, dateTimeEnd: end, title: FREE_TIME_EVENT_TITLE,
     routines: [], color: "rgba(255,255,255,255)", duration: duration}
 }
 

@@ -63,7 +63,8 @@ export const testData: State = {
   settings: {
     dayLimits: {start: {hour: 5, minute: 0}, end: {hour: 20, minute: 30}}
   },
-  routines: [{id: 1, title: "health", parentId: null, goals: [{quantity: 61, interval: "daily", type: "TIME"}]},
+  routines: [{id: 1, title: "health", parentId: null, goals: [{quantity: 61, interval: "daily", type: "TIME"}],
+  color: ROUTINE_COLORS[1]},
     {id: 2, title: "yoga", parentId: 1, goals: [{quantity: 45, interval: "weekly", type: "TIME"}],
     },
     {id: 3, title: "qigong", parentId: 1, goals: [], defaultDuration: 20},

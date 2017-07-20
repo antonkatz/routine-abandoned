@@ -11,6 +11,7 @@
 
 import React, {PureComponent} from "react";
 import {View, StyleSheet, Text} from "react-native";
+import Event from './event'
 
 export default class TimeLine extends PureComponent {
 
@@ -63,10 +64,18 @@ export default class TimeLine extends PureComponent {
   }
 
   render() {
+    const sortedEvents = this.props.events.sort((a, b) => (
+      a.dateTimeStart.valueOf() - b.dateTimeStart.valueOf()
+    ))
     return (
        <View style={styles.container}>
-         {this.renderTimeBins()}
+         {/*{this.renderTimeBins()}*/}
+
+         {sortedEvents.map(e => (
+           <Event key={e.id} {...e}/>
+         ))}
        </View>
+
     )
   }
 }
