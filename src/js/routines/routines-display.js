@@ -7,7 +7,7 @@ import {VIEW_ROUTINES_PATH} from '../navigation/constants'
 import {Card, CardActions, CardHeader, CardMedia, CardTitle, CardText} from 'material-ui/Card';
 import Avatar from 'material-ui/Avatar';
 import Chip from 'material-ui/Chip';
-import {DEFAULT_ROUTINE_COLOR, getAvatarTextColor} from './routine-colors'
+import {DEFAULT_ROUTINE_COLOR, getAvatarTextColor} from '../color-constants'
 import {minutesToDisplayTime} from '../display-helpers'
 import type {Goal, Routine} from '../redux/store'
 import FlatButton from 'material-ui/FlatButton';

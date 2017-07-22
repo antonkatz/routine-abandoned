@@ -27,7 +27,16 @@ const plans = (state: Array<Plan> = [], action: Action): Array<Routine> => {
   }
 }
 
-const routineApp = combineReducers({routines, plans})
+const settings = (state: Array<Plan> = [], action: Action): Array<Routine> => {
+  switch (action.type) {
+    default:
+      (action: empty)
+      return state
+  }
+}
+
+
+const routineApp = combineReducers({routines, plans, settings})
 
 
 export {routineApp}

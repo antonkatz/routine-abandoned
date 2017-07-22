@@ -4,23 +4,7 @@ import { connect } from 'react-redux'
 import type {State, Routine} from '../redux/store'
 import {addRoutine} from '../redux/actions'
 import {navigateToRoutineChildren} from './routines-controls'
-
-function getChildren(state: State, id: ?number) {
-  if (!id) {
-    return state.routines.filter((r) => {
-      return !r.parentId
-    })
-  }
-  return state.routines.filter((r) => {return r.parentId === id} );
-}
-
-function getRoutine(state: State, id: number): Routine {
-  if (id) {
-    return state.routines.find(r => (r.id === id))
-  } else {
-    return null
-  }
-}
+import {getRoutineChildrenOrRoot, getRoutine} from '../helpers'
 
 function cleanRoutineId(dirtyId) {
   return dirtyId ? Number(dirtyId) : null
@@ -32,7 +16,7 @@ const mapStateToProps = (state: State, ownProps ) => {
   return {
     parentId: parentId,
     parentRoutine: getRoutine(state, parentId),
-    routineChildren: getChildren(state, parentId),
+    routineChildren: getRoutineChildrenOrRoot(state, parentId),
     navigation: {
       down: navigateToRoutineChildren(ownProps.history),
       up: () => (ownProps.history.goBack())

@@ -1,7 +1,7 @@
 /**
  * @flow
  * */
-import type {RoutineColor} from '../routines/routine-colors'
+import type {RoutineColor} from '../color-constants'
 import type {State, Plan, Routine, PlanRepetition, WeeklyPlanRepetition} from '../redux/store'
 
 export type Event = {

@@ -3,12 +3,15 @@
  * */
 
 import type {State, Plan, Routine, PlanRepetition, WeeklyPlanRepetition} from '../redux/store'
-import type {RoutineColor} from '../routines/routine-colors'
+import type {RoutineColor} from '../color-constants'
 import Schedule from './schedule'
 import { connect } from 'react-redux'
 import {Event} from './schedule-types-constants'
+import {getRoutineChildrenOrRoot, getRoutine} from '../helpers'
+import {DEFAULT_ROUTINE_COLOR} from '../color-constants'
 
-function processStatePlansToEvents(plans: Array<Plan>, routineFinder: (id: number) => Routine): Array<Event> {
+function processStatePlansToEvents(plans: Array<Plan>, routineFinder: (id: number) => Routine,
+routineChildFinder: (id: number) => Array<Routine>): Array<Event> {
   const nestedEvents: Array<Array<Event>> = plans.map(p => {
     // each plan can have multiple repetitions
     return getDates(p).map(d => {
@@ -19,7 +22,7 @@ function processStatePlansToEvents(plans: Array<Plan>, routineFinder: (id: numbe
         dateTimeEnd: d.end,
         duration: d.duration,
         title: getTitle(p, routineFinder),
-        routines: [],
+        routines: getRoutines(p, routineChildFinder),
         color: getColor(p, routineFinder)
       };
       return event
@@ -31,6 +34,10 @@ function processStatePlansToEvents(plans: Array<Plan>, routineFinder: (id: numbe
   return nestedEvents.reduce((a,b) => {
     return a.concat(b)
   })
+}
+
+function getRoutines(plan: Plan, routineChildFinder): Array<Routine> {
+  return routineChildFinder(plan.parentRoutineId)
 }
 
 function getDates(plan: Plan): Array<{start: Date, end: Date, duration: number}> {
@@ -61,7 +68,7 @@ function getTitle(plan: Plan, routineFinder): string {
 
 function getColor(plan: Plan, routineFinder): RoutineColor {
   const c = plan.color ? plan.color : routineFinder(plan.parentRoutineId).color
-  return c ? c : 'rgba(0,0,0,0)'
+  return c ? c : DEFAULT_ROUTINE_COLOR
 }
 
 
@@ -73,10 +80,14 @@ function mapStateToProps(state: State) {
     return found ? found : null
   }
 
+  function getRoutineChildren(routineId): Array<Routine> {
+    return getRoutineChildrenOrRoot(state, routineId)
+  }
+
   return {
     dayStart: state.settings.dayLimits.start,
     dayEnd: state.settings.dayLimits.end,
-    events: processStatePlansToEvents(state.plans, getParentRoutineById)
+    events: processStatePlansToEvents(state.plans, getParentRoutineById, getRoutineChildren)
   }
 }
 

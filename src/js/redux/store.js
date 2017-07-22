@@ -2,8 +2,8 @@
  * @flow
  */
 
-import type {RoutineColor} from '../routines/routine-colors'
-import {ROUTINE_COLORS} from '../routines/routine-colors'
+import type {RoutineColor} from '../color-constants'
+import {ROUTINE_COLORS} from '../color-constants'
 
 /* COMMON */
 export type TimePoint = {+hour: number, +minute: number}

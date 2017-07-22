@@ -12,6 +12,7 @@
 import React, {PureComponent} from "react";
 import {View, StyleSheet, Text} from "react-native";
 import Event from './event'
+import RoutineEvent from './routine-event'
 
 export default class TimeLine extends PureComponent {
 
@@ -64,15 +65,26 @@ export default class TimeLine extends PureComponent {
   }
 
   render() {
+    if (this.props.active === false) {
+      return null;
+    }
     const sortedEvents = this.props.events.sort((a, b) => (
       a.dateTimeStart.valueOf() - b.dateTimeStart.valueOf()
     ))
+    //todo sort the routines
+    let sortedRoutines = []
+    if (this.props.routines) {
+      sortedRoutines = this.props.routines
+    }
     return (
        <View style={styles.container}>
          {/*{this.renderTimeBins()}*/}
 
          {sortedEvents.map(e => (
            <Event key={e.id} {...e}/>
+         ))}
+         {sortedRoutines.map(r => (
+           <RoutineEvent key={r.id} {...r}/>
          ))}
        </View>
 

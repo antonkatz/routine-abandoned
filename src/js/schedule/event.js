@@ -3,19 +3,41 @@
  */
 
 
-import React from "react";
+import React, {Component} from "react";
 import {View, StyleSheet, Text} from "react-native";
+import {minutesToDisplayTime} from "../display-helpers"
+import TimeLine from './timeline'
+import {DEFAULT_ROUTINE_COLOR} from '../color-constants'
 
-export default Event = (props) => {
-  return (
-    <View style={styles.outerContainer}>
-      <View style={[styles.colorBar, {backgroundColor: props.color}]}></View>
-      <View style={styles.innerContainer}>
-        <View>{props.title}</View>
-        <View>{props.duration}</View>
+export default class Event extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      expanded: false
+    };
+
+    this.toggleExpand = this.toggleExpand.bind(this);
+  }
+
+  toggleExpand() {
+    this.setState(pState => {
+      return {expanded: !pState.expanded}
+    })
+  }
+
+  render() {
+    return (
+      <View style={styles.outerContainer}>
+        <View
+          style={[styles.colorBar, {backgroundColor: this.props.color ? this.props.color : DEFAULT_ROUTINE_COLOR}]}></View>
+        <View style={styles.innerContainer} onClick={this.toggleExpand}>
+          <View>{this.props.title}</View>
+          <View>{minutesToDisplayTime(this.props.duration)}</View>
+        </View>
+        <TimeLine active={this.state.expanded} events={[]} routines={this.props.routines}/>
       </View>
-    </View>
-  )
+    )
+  }
 }
 
 const styles = StyleSheet.create({
