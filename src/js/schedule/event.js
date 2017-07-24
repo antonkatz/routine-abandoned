@@ -8,8 +8,11 @@ import {View, StyleSheet, Text} from "react-native";
 import {minutesToDisplayTime} from "../display-helpers"
 import TimeLine from './timeline'
 import {DEFAULT_ROUTINE_COLOR} from '../color-constants'
+import {Event as EventType} from './schedule-types-constants'
 
 export default class Event extends Component {
+  props: EventType
+
   constructor(props) {
     super(props);
     this.state = {
@@ -44,23 +47,28 @@ const styles = StyleSheet.create({
   outerContainer: {
     display: 'flex',
     flex: 1,
-    borderWidth: 1,
-    borderColor: "black",
-    borderStyle: "solid",
+    // borderWidth: 1,
+    // borderColor: "black",
+    // borderStyle: "solid",
     flexDirection: 'row',
     flexWrap: 'nowrap',
     justifyContent: "flex-start"
   },
   innerContainer: {
-    flexShrink: 1
+    flexShrink: 1,
+    flexGrow: 1,
+    // borderStyle: 'dashed',
+    // borderColor: 'blue',
+    // borderWidth: StyleSheet.hairlineWidth
   },
   colorBar: {
     // flexBasis: '100%',
     flexShrink: 1,
-    width: 5,
+    flexGrow: 0,
+    width: 10,
     // height: '100%',
-    borderWidth: 1,
-    borderColor: "red",
+    // borderRightWidth: StyleSheet.hairlineWidth,
+    borderColor: "black",
     borderStyle: "solid"
   }
 })

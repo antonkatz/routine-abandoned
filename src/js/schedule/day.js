@@ -27,12 +27,13 @@ function createFreeEvent(start: Date, end: Date) {
   return {
     id: FREE_TIME_EVENT_TITLE + start.valueOf() + end.valueOf(), parentPlanId: null,
     dateTimeStart: start, dateTimeEnd: end, title: FREE_TIME_EVENT_TITLE,
-    routines: [], color: "rgba(255,255,255,255)", duration: duration}
+    routines: [], color: "rgba(255,255,255,255)", duration: duration,
+    type: 'single'}
 }
 
 function fillNonEventTime(props): Array<Event> {
   let upperPoint = getDateWithSetTime(props.date, props.dayStart.hour, props.dayStart.minute)
-  let currentPoint = upperPoint
+  let currentPoint: Date = upperPoint
   const lowestPoint = getDateWithSetTime(props.date, props.dayEnd.hour, props.dayEnd.minute)
 
   // const startTimes = props.events.map(e => (e.dateTimeStart)).sort();
@@ -40,14 +41,17 @@ function fillNonEventTime(props): Array<Event> {
 
   const freeTimeBlocks = []
 
+  console.log(props.events)
+
   if (props.events.length === 0) {
     freeTimeBlocks.push(createFreeEvent(upperPoint, lowestPoint))
   } else {
-    while (currentPoint.valueOf() < lowestPoint.valueOf() || flagDone) {
+    while (currentPoint.valueOf() < lowestPoint.valueOf()) {
       const nextSortedEvents = props.events.map(e => (
         Object.assign({}, {diff: e.dateTimeStart.valueOf() - currentPoint.valueOf()}, e)
       ))
-        .filter(e => (e.diff > 0))
+        // filtering out events that happen before the current point
+        .filter(e => (e.diff >= 0))
         .sort((eA, eB) => (
         eA.diff - eB.diff
       ))
@@ -56,7 +60,16 @@ function fillNonEventTime(props): Array<Event> {
       }
 
       const closestEvent = nextSortedEvents[0]
+      if (nextSortedEvents[0].diff === 0) {
+        currentPoint = closestEvent.dateTimeEnd
+        continue
+      }
+
       freeTimeBlocks.push(createFreeEvent(currentPoint, closestEvent.dateTimeStart))
+
+      console.log(nextSortedEvents)
+      console.log(currentPoint, closestEvent.dateTimeStart)
+      console.log(closestEvent.dateTimeEnd)
 
       // figuring out where to start next
       currentPoint = closestEvent.dateTimeEnd

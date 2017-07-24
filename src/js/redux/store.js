@@ -68,7 +68,7 @@ export const testData: State = {
     {id: 2, title: "yoga", parentId: 1, goals: [{quantity: 45, interval: "weekly", type: "TIME"}],
     },
     {id: 3, title: "qigong", parentId: 1, goals: [], defaultDuration: 20},
-    {id: 4, title: "chores", parentId: null, goals: [], color: ROUTINE_COLORS[0],
+    {id: 4, title: "chores", parentId: null, goals: [], color: ROUTINE_COLORS[7],
     description: "stuff around the house"},
     {id: 5, title: "acro", description: "partner yoga/acrobatics", parentId: 2,
       goals: [{quantity: 35, interval: "daily", type: "TIME"}, {quantity: 205, interval: "weekly", type: "TIME"}], color: ROUTINE_COLORS[5]},
@@ -78,7 +78,11 @@ export const testData: State = {
   plans: [
     {id: 1, parentRoutineId: 1, includeRoutines: [], excludeRoutines: [], includePlans: [], repetition: [
       {type: "weekly", weekday: 1, hour: 17, minute: 50, duration: 90}
-    ]}
+    ]},
+    {id: 2, parentRoutineId: 4, includeRoutines: [], excludeRoutines: [], includePlans: [], repetition: [
+      {type: "weekly", weekday: 1, hour: 18, minute: 10, duration: 30}
+    ]},
+
   ]
 }
 

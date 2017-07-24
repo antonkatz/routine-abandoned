@@ -13,6 +13,7 @@ import React, {PureComponent} from "react";
 import {View, StyleSheet, Text} from "react-native";
 import Event from './event'
 import RoutineEvent from './routine-event'
+import AlternativeEvent from './alternative-event'
 
 export default class TimeLine extends PureComponent {
 
@@ -80,9 +81,13 @@ export default class TimeLine extends PureComponent {
        <View style={styles.container}>
          {/*{this.renderTimeBins()}*/}
 
-         {sortedEvents.map(e => (
-           <Event key={e.id} {...e}/>
-         ))}
+         {sortedEvents.map(e => {
+           if (e.type === 'single') {
+             return <Event key={e.id} {...e}/>
+           } else if (e.type == 'alternative') {
+             return <AlternativeEvent key={e.id} {...e}/>
+           }
+         })}
          {sortedRoutines.map(r => (
            <RoutineEvent key={r.id} {...r}/>
          ))}
