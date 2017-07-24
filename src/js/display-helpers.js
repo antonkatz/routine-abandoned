@@ -20,3 +20,11 @@ export function dayOfWeekToText(day: number): string {
   }
 
 }
+
+export function displayTimePoint(date: Date): string {
+  let minutes = date.getMinutes()
+  let hours = date.getHours()
+  minutes = (minutes < 10) ? "0" + minutes : minutes + ""
+  hours = hours < 10 ? "0" + hours : "" + hours
+  return (hours + ":" + minutes)
+}

@@ -41,7 +41,7 @@ function fillNonEventTime(props): Array<Event> {
 
   const freeTimeBlocks = []
 
-  console.log(props.events)
+  // console.log(props.events)
 
   if (props.events.length === 0) {
     freeTimeBlocks.push(createFreeEvent(upperPoint, lowestPoint))
@@ -67,9 +67,9 @@ function fillNonEventTime(props): Array<Event> {
 
       freeTimeBlocks.push(createFreeEvent(currentPoint, closestEvent.dateTimeStart))
 
-      console.log(nextSortedEvents)
-      console.log(currentPoint, closestEvent.dateTimeStart)
-      console.log(closestEvent.dateTimeEnd)
+      // console.log(nextSortedEvents)
+      // console.log(currentPoint, closestEvent.dateTimeStart)
+      // console.log(closestEvent.dateTimeEnd)
 
       // figuring out where to start next
       currentPoint = closestEvent.dateTimeEnd

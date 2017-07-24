@@ -28,3 +28,7 @@ export function getRoutine(state: State, id: number): Routine {
     return null
   }
 }
+
+export function dateSorter(a: Date, b: Date) {
+  return a.valueOf() - b.valueOf()
+}
