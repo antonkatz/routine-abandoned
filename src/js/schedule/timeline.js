@@ -38,14 +38,19 @@ export default class TimeLine extends PureComponent {
     const timeLineStartTime = this.getStartTime()
     let points = events.map(e => (
       e.dateTimeStart
-    )).sort(dateSorter)
+    ))
     if (points.findIndex(p => {
-        console.log(p, timeLineStartTime)
         return p.valueOf() === timeLineStartTime.valueOf()
       }) === -1) {
       points = [this.getStartTime(), ...points]
     }
     points.push(this.getEndTime())
+    // now
+    // const now = new Date()
+    // if (now.valueOf() <= this.getEndTime().valueOf() && now.valueOf() >= this.getStartTime().valueOf()) {
+    //   points.push(now)
+    // }
+    points = points.sort(dateSorter)
     return points;
   }
 
@@ -65,6 +70,7 @@ export default class TimeLine extends PureComponent {
     }
 
     const bins = []
+    console.log(timePoints, "timepoints")
     for (let i = 0; i < timePoints.length - 1; i++) {
       const start = timePoints[i]
       const end = timePoints[i + 1]
@@ -93,14 +99,11 @@ export default class TimeLine extends PureComponent {
 
     if (sortedRoutines.length > 0) {
       bins.push(
-        <View style={styles.container} key="routines">
-          <Text>routines</Text>
-          <View>
+        <TimeBin key="routines" text="routines">
             {sortedRoutines.map(r => (
               <RoutineEvent key={r.id} {...r}/>
             ))}
-          </View>
-        </View>
+        </TimeBin>
       )
     }
 
@@ -113,10 +116,31 @@ export default class TimeLine extends PureComponent {
   }
 }
 
+const TimeBin = (props: {text: string, children: any}) => {
+  return (
+    <View style={styles.binContainer}>
+      <Text>{props.text}</Text>
+      <View>
+        {props.children}
+      </View>
+    </View>
+  )
+}
+
+// const CurrentTimeMarker = (props) => {
+//   return (
+//     <View style={styles.marker}></View>
+//   )
+// }
+
 const styles = StyleSheet.create({
-  container: {
+  binContainer: {
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between'
+  },
+  marker: {
+    height: 3,
+    backgroundColor: 'red'
   }
 })

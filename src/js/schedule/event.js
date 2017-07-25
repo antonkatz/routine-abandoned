@@ -37,7 +37,8 @@ export default class Event extends Component {
           <View>{this.props.title}</View>
           <View>{minutesToDisplayTime(this.props.duration)}</View>
         </View>
-        <TimeLine active={this.state.expanded} events={[]} routines={this.props.routines}/>
+        <TimeLine active={this.state.expanded} events={[]} routines={this.props.routines}
+                  startTime={this.props.dateTimeStart} endTime={this.props.dateTimeEnd}/>
       </View>
     )
   }
