@@ -7,8 +7,9 @@ import type {RoutineColor} from '../color-constants'
 import Schedule from './schedule'
 import { connect } from 'react-redux'
 import {Event, AlternativeEvents, SingleEvent} from './schedule-types-constants'
-import {getRoutineChildrenOrRoot, getRoutine, getDurationInMinutes} from '../helpers'
+import {getRoutineChildrenOrRoot, filterEventsByDate, getDurationInMinutes, getDateWithSetTime} from '../helpers'
 import {DEFAULT_ROUTINE_COLOR} from '../color-constants'
+import {FREE_TIME_EVENT_TITLE} from './schedule-types-constants'
 
 /* Initialization */
 
@@ -38,8 +39,11 @@ export function updateEvents(state: State): State.appState {
     return getRoutineChildrenOrRoot(state, routineId)
   }
 
-  return Object.assign({}, state.appState, {events:
-    processStatePlansToEvents(state.plans, getParentRoutineById, getRoutineChildren)})
+  const events = processStatePlansToEvents(state.plans, getParentRoutineById, getRoutineChildren)
+  const freeEvents = fillNonEventTime(events, state.appState.daysToDisplay, state.settings.dayLimits)
+
+  const appState = Object.assign({}, state.appState, {events: events, freeTimeEvents: freeEvents})
+  return appState
 }
 
 export function processStatePlansToEvents(plans: Array<Plan>, routineFinder: (id: number) => Routine,
@@ -98,7 +102,7 @@ function getDateForWeeklyRepetition(r: WeeklyPlanRepetition): Date {
   const dayOfWeek = today.getDay();
   const diff = r.weekday - dayOfWeek
   let projectBy = diff > 0 ? diff : (7 + diff)
-  if (diff == 0) {
+  if (diff === 0) {
     projectBy = 0
   }
   const repeatOn = new Date()
@@ -187,10 +191,74 @@ function convertConflictsIntoAlternatives(events: Array<Event>): {
   return {events: normalEvents, alternativeEvents: alternativeEvents}
 }
 
+function fillNonEventTime(events: Array<Event>, daysToDisplay, dayLimits): Array<Event> {
+  const nestedFreeEvents = daysToDisplay.map(date => {
+    const eventsOnDate = filterEventsByDate(events, date)
+    let upperPoint = getDateWithSetTime(date, dayLimits.start.hour,
+      dayLimits.start.minute)
+    let currentPoint: Date = upperPoint
+    const lowestPoint = getDateWithSetTime(date, dayLimits.end.hour,
+      dayLimits.end.minute)
+
+    const freeTimeBlocks = []
+    if (eventsOnDate.length === 0) {
+      freeTimeBlocks.push(createFreeEvent(upperPoint, lowestPoint))
+    } else {
+      while (currentPoint.valueOf() < lowestPoint.valueOf()) {
+        const nextSortedEvents = eventsOnDate.map(e => (
+          Object.assign({}, {diff: e.dateTimeStart.valueOf() - currentPoint.valueOf()}, e)
+        ))
+        // filtering out events that happen before the current point
+          .filter(e => (e.diff >= 0))
+          .sort((eA, eB) => (
+            eA.diff - eB.diff
+          ))
+        if (nextSortedEvents.length === 0) {
+          break
+        }
+
+        const closestEvent = nextSortedEvents[0]
+        if (nextSortedEvents[0].diff === 0) {
+          currentPoint = closestEvent.dateTimeEnd
+          continue
+        }
+
+        freeTimeBlocks.push(createFreeEvent(currentPoint, closestEvent.dateTimeStart))
+
+        // figuring out where to start next
+        currentPoint = closestEvent.dateTimeEnd
+        // seeing if any events start within the time of the closest event
+        for (let i = 1; i < nextSortedEvents.length; i++) {
+          const e = nextSortedEvents[i]
+          if (e.dateTimeStart.valueOf() < currentPoint.valueOf()) {
+            currentPoint = e.dateTimeEnd
+          }
+        }
+      }
+
+      if (currentPoint.valueOf() < lowestPoint.valueOf()) {
+        freeTimeBlocks.push(createFreeEvent(currentPoint, lowestPoint))
+      }
+    }
+
+    return freeTimeBlocks
+  })
+
+  return nestedFreeEvents.reduce((a,b) => ([...a, ...b]))
+}
+
+function createFreeEvent(start: Date, end: Date) {
+  const duration = Math.floor((end.valueOf() - start.valueOf()) / 1000 / 60)
+  return {
+    id: FREE_TIME_EVENT_TITLE + start.valueOf() + end.valueOf(), parentPlanId: null,
+    dateTimeStart: start, dateTimeEnd: end, title: FREE_TIME_EVENT_TITLE,
+    routines: [], color: "rgba(255,255,255,255)", duration: duration,
+    type: 'single'}
+}
+
 function getRoutines(plan: Plan, routineChildFinder): Array<Routine> {
   return routineChildFinder(plan.parentRoutineId)
 }
-
 
 function getTitle(plan: Plan, routineFinder): string {
   return plan.title ? plan.title : routineFinder(plan.parentRoutineId).title
@@ -205,20 +273,7 @@ function getColor(plan: Plan, routineFinder): RoutineColor {
 /* Redux */
 
 function mapStateToProps(state: State) {
-  function getParentRoutineById (routineId): Routine {
-    const found = state.routines.find(r => (r.id === routineId))
-    return found ? found : null
-  }
-
-  function getRoutineChildren(routineId): Array<Routine> {
-    return getRoutineChildrenOrRoot(state, routineId)
-  }
-
-  return {
-    dayStart: state.settings.dayLimits.start,
-    dayEnd: state.settings.dayLimits.end,
-    events: processStatePlansToEvents(state.plans, getParentRoutineById, getRoutineChildren)
-  }
+  return {}
 }
 
 const ConnectedSchedule = connect(mapStateToProps)(Schedule)

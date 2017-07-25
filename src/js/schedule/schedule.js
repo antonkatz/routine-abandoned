@@ -10,7 +10,7 @@ export default class Schedule extends PureComponent {
   render() {
     return (
        <View style={styles.container}>
-         <Week {...this.props}/>
+         <Week/>
        </View>
     )
   }

@@ -45,11 +45,6 @@ export default class TimeLine extends React.Component {
       points = [this.getStartTime(), ...points]
     }
     points.push(this.getEndTime())
-    // now
-    // const now = new Date()
-    // if (now.valueOf() <= this.getEndTime().valueOf() && now.valueOf() >= this.getStartTime().valueOf()) {
-    //   points.push(now)
-    // }
     points = points.sort(dateSorter)
     return points;
   }
@@ -80,7 +75,6 @@ export default class TimeLine extends React.Component {
     }
 
     const bins = []
-    console.log(timePoints, "timepoints")
     for (let i = 0; i < timePoints.length - 1; i++) {
       const start = timePoints[i]
       const end = timePoints[i + 1]

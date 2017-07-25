@@ -38,7 +38,8 @@ const settings = (state: Array<State.settings> = [], action: Action): Array<Stat
 const appState = (state: State, action: Action): Array<State.appState> => {
   switch (action.type.startsWith(SCHEDULE_ACTION_PREFIX)) {
     case true:
-      return scheduleReducer(state, action)
+      const newState = scheduleReducer(state, action)
+      return newState
     default:
       (action: empty)
       return state.appState

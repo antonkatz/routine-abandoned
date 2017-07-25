@@ -37,3 +37,9 @@ export function dateSorter(a: Date, b: Date) {
 export function shiftEvent(original: Event, start: Date, end: Date): Event {
   return Object.assign({}, original, {dateTimeStart: start, dateTimeEnd: end, duration: getDurationInMinutes(start, end)})
 }
+
+export function filterEventsByDate(events: Array<Event>, day: Date): Array<Event> {
+  return events.filter((e: Event) => (
+    e.dateTimeStart.toDateString() === day.toDateString()
+  ))
+}
