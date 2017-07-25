@@ -8,12 +8,13 @@ import {View, StyleSheet, Text} from "react-native";
 import {minutesToDisplayTime} from "../display-helpers"
 import TimeLine from './timeline'
 import {DEFAULT_ROUTINE_COLOR} from '../color-constants'
+import {eventStyles} from './schedule-types-constants'
 
 export default RoutineEvent = (props) => {
   return (
-    <View style={styles.outerContainer}>
-      <View style={[styles.colorBar, {backgroundColor: props.color ? props.color : DEFAULT_ROUTINE_COLOR}]}></View>
-      <View style={styles.innerContainer}>
+    <View style={eventStyles.outerContainer}>
+      <View style={[eventStyles.colorBar, {backgroundColor: props.color ? props.color : DEFAULT_ROUTINE_COLOR}]}></View>
+      <View style={eventStyles.innerContainer}>
         <View>{props.title}</View>
         <TimeLine active={false}/>
       </View>

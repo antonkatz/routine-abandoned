@@ -4,7 +4,7 @@
 
 
 import React, {Component} from "react";
-import {View, StyleSheet, Text} from "react-native";
+import {View, StyleSheet, Text, TouchableHighlight} from "react-native";
 import {minutesToDisplayTime} from "../display-helpers"
 import TimeLine from './timeline'
 import {DEFAULT_ROUTINE_COLOR} from '../color-constants'
@@ -33,10 +33,12 @@ export default class Event extends Component {
       <View style={styles.outerContainer}>
         <View
           style={[styles.colorBar, {backgroundColor: this.props.color ? this.props.color : DEFAULT_ROUTINE_COLOR}]}></View>
-        <View style={styles.innerContainer} onClick={this.toggleExpand}>
-          <View>{this.props.title}</View>
-          <View>{minutesToDisplayTime(this.props.duration)}</View>
-        </View>
+        <TouchableHighlight onPress={this.toggleExpand}>
+          <View style={styles.innerContainer}>
+            <View>{this.props.title}</View>
+            <View>{minutesToDisplayTime(this.props.duration)}</View>
+          </View>
+        </TouchableHighlight>
         <TimeLine active={this.state.expanded} events={[]} routines={this.props.routines}
                   startTime={this.props.dateTimeStart} endTime={this.props.dateTimeEnd}/>
       </View>

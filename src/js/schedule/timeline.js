@@ -25,21 +25,6 @@ export type TimeLineProps = {
 export default class TimeLine extends React.Component {
   props: TimeLineProps
 
-  constructor(props) {
-    super(props)
-    // splitting the event at the current time point into two
-    const now = new Date()
-    this.state = {now: now}
-    const currentEvent = this.props.events.findIndex(e => (e.dateTimeStart.valueOf() <= now.valueOf() &&
-    e.dateTimeEnd.valueOf() >= now.valueOf()))
-    if (currentEvent > -1) {
-      const e = this.props.events[currentEvent]
-      const topEvent = shiftEvent(e, e.dateTimeStart, now)
-      const bottomEvent = shiftEvent(e, now, e.dateTimeEnd)
-      this.props.events.splice(currentEvent, 1, topEvent, bottomEvent)
-    }
-  }
-
   getStartTime(): Date {
     return this.props.startTime
   }
@@ -74,7 +59,16 @@ export default class TimeLine extends React.Component {
       return null;
     }
 
-    const now = this.state.now
+    const now = new Date()
+    const currentEvent = this.props.events.findIndex(e => (e.dateTimeStart.valueOf() <= now.valueOf() &&
+    e.dateTimeEnd.valueOf() >= now.valueOf()))
+    if (currentEvent > -1) {
+      const e = this.props.events[currentEvent]
+      const topEvent = shiftEvent(e, e.dateTimeStart, now)
+      const bottomEvent = shiftEvent(e, now, e.dateTimeEnd)
+      this.props.events.splice(currentEvent, 1, topEvent, bottomEvent)
+    }
+
     const timePoints = this.getTimePoints(this.props.events)
     const sortedEvents = this.props.events.sort((a, b) => (
       a.dateTimeStart.valueOf() - b.dateTimeStart.valueOf()
