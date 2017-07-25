@@ -9,7 +9,7 @@ import Avatar from 'material-ui/Avatar';
 import Chip from 'material-ui/Chip';
 import {DEFAULT_ROUTINE_COLOR, getAvatarTextColor} from '../color-constants'
 import {minutesToDisplayTime} from '../display-helpers'
-import type {Goal, Routine} from '../redux/store'
+import type {Goal, Routine} from '../redux/state'
 import FlatButton from 'material-ui/FlatButton';
 import Divider from 'material-ui/Divider';
 import Subheader from 'material-ui/Subheader';

@@ -2,7 +2,7 @@
  * @flow
  * */
 import type {RoutineColor} from '../color-constants'
-import type {State, Plan, Routine, PlanRepetition, WeeklyPlanRepetition} from '../redux/store'
+import type {State, Plan, Routine, PlanRepetition, WeeklyPlanRepetition} from '../redux/state'
 import {StyleSheet} from 'react-native'
 
 
@@ -13,7 +13,7 @@ export type Event = {
 
 export type SingleEvent = Event & {
   parentPlanId: ?number, type: 'single',
-  title: string, routines: Array<Routine>, color: RoutineColor
+  title: string, routines: Array<Routine>, color: RoutineColor, includes: Array<Event>
 }
 
 export type AlternativeEvents =  Event & {

@@ -4,7 +4,7 @@
 
 import type {RoutineColor} from '../color-constants'
 import {ROUTINE_COLORS} from '../color-constants'
-
+import type {Event, SingleEvent, AlternativeEvents} from '../schedule/schedule-types-constants'
 /* COMMON */
 export type TimePoint = {+hour: number, +minute: number}
 
@@ -41,16 +41,24 @@ export type Plan = {+id: number, +parentRoutineId: number, +title?: string, +rep
   +color?: RoutineColor, +includeRoutines: Array<number>, +excludeRoutines: Array<number>,
   +includePlans: Array<Plan>
 }
+export type TimePosition = {timePositionType: 'absolute' | 'relative'}
 
 export type PlanRepetition = {type: string, +duration: number} & (DailyPlanRepetition | WeeklyPlanRepetition | SinglePlanRepetition)
 /** @property weekday 0 is sunday */
-export type WeeklyPlanRepetition = TimePoint & {+type: "weekly", +weekday: number}
-export type DailyPlanRepetition = TimePoint & {+type: "daily", +from: Date, +every: number}
-export type SinglePlanRepetition = TimePoint & {+type: "single", +datetime: Date}
+export type WeeklyPlanRepetition = TimePoint & TimePosition & {+type: "weekly", +weekday: number}
+export type DailyPlanRepetition = TimePoint & TimePosition & {+type: "daily", +from: Date, +every: number}
+export type SinglePlanRepetition = TimePoint & TimePosition & {+type: "single", +date: Date}
+export type ParentPlanRepetition = TimePoint & TimePosition & {+type: "parent"}
 
 /* STATE */
 
 export type State = {
+  +appState: {
+    +daysToDisplay: Array<Date>,
+    +displayAllEvents: Boolean,
+    +eventsToDisplay: Array<string>,
+    +events: Array<Event>
+  },
   +settings: {
     dayLimits: {start: TimePoint, end: TimePoint}
   },
@@ -60,6 +68,13 @@ export type State = {
 }
 
 export const testData: State = {
+  // data that is not stored and is in constant flux; used to create displays
+  appState: {
+    daysToDisplay: [],
+    displayAllEvents: true,
+    eventsToDisplay: [],
+    events: []
+  },
   settings: {
     dayLimits: {start: {hour: 5, minute: 0}, end: {hour: 20, minute: 30}}
   },

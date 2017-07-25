@@ -1,7 +1,7 @@
 // @flow
 import RoutinesDisplay from './routines-display'
 import { connect } from 'react-redux'
-import type {State, Routine} from '../redux/store'
+import type {State, Routine} from '../redux/state'
 import {addRoutine} from '../redux/actions'
 import {navigateToRoutineChildren} from './routines-controls'
 import {getRoutineChildrenOrRoot, getRoutine} from '../helpers'

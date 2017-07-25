@@ -2,7 +2,7 @@
  * @flow
  * */
 
-import type {State, Plan, Routine, PlanRepetition, WeeklyPlanRepetition} from '../redux/store'
+import type {State, Plan, Routine, PlanRepetition, WeeklyPlanRepetition} from '../redux/state'
 import type {RoutineColor} from '../color-constants'
 import Schedule from './schedule'
 import { connect } from 'react-redux'
@@ -10,12 +10,48 @@ import {Event, AlternativeEvents, SingleEvent} from './schedule-types-constants'
 import {getRoutineChildrenOrRoot, getRoutine, getDurationInMinutes} from '../helpers'
 import {DEFAULT_ROUTINE_COLOR} from '../color-constants'
 
-function processStatePlansToEvents(plans: Array<Plan>, routineFinder: (id: number) => Routine,
-routineChildFinder: (id: number) => Array<Routine>): Array<Event> {
+/* Initialization */
+
+export function initializeState(state: State.appState) {
+  return Object.assign({}, state, {daysToDisplay: getDatesOfWeek()})
+}
+
+function getDatesOfWeek() {
+  let dates = new Array(7).fill(null);
+  dates = dates.map((v, i) => {
+    let date = new Date();
+    date.setDate(date.getDate() + i);
+    return date
+  });
+  return dates
+}
+
+/* Converting plans into concrete events */
+
+export function updateEvents(state: State): State.appState {
+  function getParentRoutineById (routineId): Routine {
+    const found = state.routines.find(r => (r.id === routineId))
+    return found ? found : null
+  }
+
+  function getRoutineChildren(routineId): Array<Routine> {
+    return getRoutineChildrenOrRoot(state, routineId)
+  }
+
+  return Object.assign({}, state.appState, {events:
+    processStatePlansToEvents(state.plans, getParentRoutineById, getRoutineChildren)})
+}
+
+export function processStatePlansToEvents(plans: Array<Plan>, routineFinder: (id: number) => Routine,
+routineChildFinder: (id: number) => Array<Routine>, parentEvent: ?Event): Array<Event> {
+  if (plans.length === 0) {
+    return []
+  }
+  // processing plans into individual events
   const nestedEvents: Array<Array<SingleEvent>> = plans.map(p => {
     // each plan can have multiple repetitions
-    return getDates(p).map(d => {
-      const event: SingleEvent = {
+    return getDates(p, parentEvent).map(d => {
+      let event: SingleEvent = {
         id: '' + p.id + d.end.valueOf() + d.end.valueOf(),
         parentPlanId: p.id,
         dateTimeStart: d.start,
@@ -26,6 +62,9 @@ routineChildFinder: (id: number) => Array<Routine>): Array<Event> {
         color: getColor(p, routineFinder),
         type: 'single'
       };
+      event = Object.assign({}, event, {
+        includes: processStatePlansToEvents(p.includePlans, routineFinder, routineChildFinder, event)
+      })
       return event
 
     })
@@ -38,6 +77,34 @@ routineChildFinder: (id: number) => Array<Routine>): Array<Event> {
 
   const withAlternatives = convertConflictsIntoAlternatives(events)
   return [...withAlternatives.alternativeEvents, ...withAlternatives.events]
+}
+
+/** different plans have different types of repetition such as weekly (on the same week day) or daily (every _n_ days)
+ * given a plan, returns start date, end date, and duration in minutes */
+function getDates(plan: Plan, parentEvent: ?Event): Array<{start: Date, end: Date, duration: number}> {
+  return plan.repetition.map((r: PlanRepetition) => {
+    if (r.type === "weekly") {
+      const start = getDateForWeeklyRepetition(r)
+      const end = new Date(start.valueOf() + r.duration * 60 * 1000)
+      return {start: start, end: end, duration: r.duration}
+    } else {
+      throw new Error("Not supported")
+    }
+  })
+}
+
+function getDateForWeeklyRepetition(r: WeeklyPlanRepetition): Date {
+  const today = new Date()
+  const dayOfWeek = today.getDay();
+  const diff = r.weekday - dayOfWeek
+  let projectBy = diff > 0 ? diff : (7 + diff)
+  if (diff == 0) {
+    projectBy = 0
+  }
+  const repeatOn = new Date()
+  repeatOn.setDate(today.getDate() + projectBy)
+  repeatOn.setHours(r.hour, r.minute, 0, 0)
+  return repeatOn
 }
 
 function convertConflictsIntoAlternatives(events: Array<Event>): {
@@ -124,30 +191,6 @@ function getRoutines(plan: Plan, routineChildFinder): Array<Routine> {
   return routineChildFinder(plan.parentRoutineId)
 }
 
-function getDates(plan: Plan): Array<{start: Date, end: Date, duration: number}> {
-  return plan.repetition.map((r: PlanRepetition) => {
-    if (r.type === "weekly") {
-      const start = getDateForWeeklyRepetition(r)
-      const end = new Date(start.valueOf() + r.duration * 60 * 1000)
-      return {start: start, end: end, duration: r.duration}
-    } else {
-      throw new Error("Not supported")
-    }
-  })
-}
-function getDateForWeeklyRepetition(r: WeeklyPlanRepetition): Date {
-  const today = new Date()
-  const dayOfWeek = today.getDay();
-  const diff = r.weekday - dayOfWeek
-  let projectBy = diff > 0 ? diff : (7 + diff)
-  if (diff == 0) {
-    projectBy = 0
-  }
-  const repeatOn = new Date()
-  repeatOn.setDate(today.getDate() + projectBy)
-  repeatOn.setHours(r.hour, r.minute, 0)
-  return repeatOn
-}
 
 function getTitle(plan: Plan, routineFinder): string {
   return plan.title ? plan.title : routineFinder(plan.parentRoutineId).title

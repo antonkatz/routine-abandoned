@@ -15,7 +15,7 @@ import Event from './event'
 import RoutineEvent from './routine-event'
 import AlternativeEvent from './alternative-event'
 import {dateSorter, shiftEvent} from '../helpers'
-import {Routine} from '../redux/store'
+import {Routine} from '../redux/state'
 import {displayTimePoint} from "../display-helpers"
 
 export type TimeLineProps = {

@@ -7,7 +7,7 @@ import React from 'react';
 import RaisedButton from "material-ui/RaisedButton"
 import {Link} from '../navigation/nav-import'
 import {VIEW_ROUTINES_PATH} from '../navigation/constants'
-import type {Goal, Routine} from '../redux/store'
+import type {Goal, Routine} from '../redux/state'
 
 const OpenRoutines = () => {
   return (

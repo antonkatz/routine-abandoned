@@ -1,6 +1,6 @@
 // @flow
 
-import type {Routine} from './redux/store'
+import type {Routine} from './redux/state'
 import type {Event} from './schedule/schedule-types-constants'
 
 export function getDurationInMinutes(start: Date, end: Date): number {
