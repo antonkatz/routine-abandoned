@@ -25,13 +25,15 @@ function getEndTime(props) {
 
 function DayComponent (props) {
   const title = dayOfWeekToText(props.date.getDay());
+  const isToday = props.date.toDateString() === (new Date()).toDateString()
     return (
        <View style={styles.container}>
         <Toolbar>
           <ToolbarTitle text={title}></ToolbarTitle>
         </Toolbar>
 
-        <TimeLine events={props.events} startTime={getStartTime(props)} endTime={getEndTime(props)}/>
+        <TimeLine events={props.events} startTime={getStartTime(props)} endTime={getEndTime(props)}
+                  isCurrent={isToday}/>
 
        </View>
     )

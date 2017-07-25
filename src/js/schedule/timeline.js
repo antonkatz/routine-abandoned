@@ -25,6 +25,23 @@ export type TimeLineProps = {
 export default class TimeLine extends React.Component {
   props: TimeLineProps
 
+  constructor(props) {
+    super(props)
+    this.state = {now: new Date(), setIntervalId: null}
+  }
+
+  componentDidMount() {
+    if (this.props.isCurrent) {
+      this.interval = setInterval(() => {
+        this.setState((old) => (Object.assign({}, old, {now: new Date()})))
+      }, 1000 * 60)
+    }
+  }
+
+  componentWillUnmount() {
+    this.interval = false
+  }
+
   getStartTime(): Date {
     return this.props.startTime
   }
@@ -54,18 +71,20 @@ export default class TimeLine extends React.Component {
       return null;
     }
 
-    const now = new Date()
-    const currentEvent = this.props.events.findIndex(e => (e.dateTimeStart.valueOf() <= now.valueOf() &&
+    // slitting an event into two, for display purposes (showing current time marker)
+    const now = this.state.now
+    const events = [...this.props.events]
+    const currentEvent = events.findIndex(e => (e.dateTimeStart.valueOf() <= now.valueOf() &&
     e.dateTimeEnd.valueOf() >= now.valueOf()))
     if (currentEvent > -1) {
-      const e = this.props.events[currentEvent]
+      const e = events[currentEvent]
       const topEvent = shiftEvent(e, e.dateTimeStart, now)
       const bottomEvent = shiftEvent(e, now, e.dateTimeEnd)
-      this.props.events.splice(currentEvent, 1, topEvent, bottomEvent)
+      events.splice(currentEvent, 1, topEvent, bottomEvent)
     }
 
-    const timePoints = this.getTimePoints(this.props.events)
-    const sortedEvents = this.props.events.sort((a, b) => (
+    const timePoints = this.getTimePoints(events)
+    const sortedEvents = events.sort((a, b) => (
       a.dateTimeStart.valueOf() - b.dateTimeStart.valueOf()
     ))
     //todo sort the routines
@@ -82,9 +101,8 @@ export default class TimeLine extends React.Component {
       e.dateTimeEnd <= end.valueOf()))
       const isNow = start.valueOf() <= now.valueOf() && end.valueOf() > now.valueOf()
       bins.push(
-        <View style={[styles.container, isNow ? styles.nowBin : null]} key={start.valueOf() + "" + end.valueOf()}>
-          <Text>{displayTimePoint(start)}</Text>
-          <View>
+        <TimeBin style={isNow ? styles.nowBin : null} key={start.valueOf() + "" + end.valueOf()}
+        text={displayTimePoint(start)}>
             {eventsInBin.map(e => {
               if (e.type === 'single') {
                 return <Event key={e.id} {...e}/>
@@ -92,14 +110,11 @@ export default class TimeLine extends React.Component {
                 return <AlternativeEvent key={e.id} {...e}/>
               }
             })}
-          </View>
-        </View>
+        </TimeBin>
       )
     }
     bins.push(
-      <View style={styles.container} key={"end-of-day"}>
-        <Text>{displayTimePoint(timePoints[timePoints.length-1])}</Text>
-      </View>
+      <TimeBin key="end-of-day" text={displayTimePoint(timePoints[timePoints.length-1])} />
     )
 
     if (sortedRoutines.length > 0) {
@@ -121,9 +136,13 @@ export default class TimeLine extends React.Component {
   }
 }
 
-const TimeBin = (props: {text: string, children: any}) => {
+const TimeBin = (props: {text: string, children: any, style: ?any}) => {
+  const fullStyle = [styles.binContainer]
+  if (props.style) {
+    fullStyle.push(props.style)
+  }
   return (
-    <View style={styles.binContainer}>
+    <View style={fullStyle}>
       <Text>{props.text}</Text>
       <View>
         {props.children}
@@ -131,12 +150,6 @@ const TimeBin = (props: {text: string, children: any}) => {
     </View>
   )
 }
-
-// const CurrentTimeMarker = (props) => {
-//   return (
-//     <View style={styles.marker}></View>
-//   )
-// }
 
 const styles = StyleSheet.create({
   binContainer: {

@@ -50,9 +50,6 @@ const styles = StyleSheet.create({
   outerContainer: {
     display: 'flex',
     flex: 1,
-    // borderWidth: 1,
-    // borderColor: "black",
-    // borderStyle: "solid",
     flexDirection: 'row',
     flexWrap: 'nowrap',
     justifyContent: "flex-start"
@@ -60,17 +57,11 @@ const styles = StyleSheet.create({
   innerContainer: {
     flexShrink: 1,
     flexGrow: 1,
-    // borderStyle: 'dashed',
-    // borderColor: 'blue',
-    // borderWidth: StyleSheet.hairlineWidth
   },
   colorBar: {
-    // flexBasis: '100%',
     flexShrink: 1,
     flexGrow: 0,
     width: 10,
-    // height: '100%',
-    // borderRightWidth: StyleSheet.hairlineWidth,
     borderColor: "black",
     borderStyle: "solid"
   }
