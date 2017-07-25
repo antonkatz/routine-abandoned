@@ -14,7 +14,7 @@ import {View, StyleSheet, Text} from "react-native";
 import Event from './event'
 import RoutineEvent from './routine-event'
 import AlternativeEvent from './alternative-event'
-import dateSorter from '../helpers'
+import {dateSorter, shiftEvent} from '../helpers'
 import {Routine} from '../redux/store'
 import {displayTimePoint} from "../display-helpers"
 
@@ -22,8 +22,23 @@ export type TimeLineProps = {
   startTime: Date, endTime: Date, events: Array<Event>, active: Boolean, routines: Array<Routine>
 }
 
-export default class TimeLine extends PureComponent {
+export default class TimeLine extends React.Component {
   props: TimeLineProps
+
+  constructor(props) {
+    super(props)
+    // splitting the event at the current time point into two
+    const now = new Date()
+    this.state = {now: now}
+    const currentEvent = this.props.events.findIndex(e => (e.dateTimeStart.valueOf() <= now.valueOf() &&
+    e.dateTimeEnd.valueOf() >= now.valueOf()))
+    if (currentEvent > -1) {
+      const e = this.props.events[currentEvent]
+      const topEvent = shiftEvent(e, e.dateTimeStart, now)
+      const bottomEvent = shiftEvent(e, now, e.dateTimeEnd)
+      this.props.events.splice(currentEvent, 1, topEvent, bottomEvent)
+    }
+  }
 
   getStartTime(): Date {
     return this.props.startTime
@@ -59,6 +74,7 @@ export default class TimeLine extends PureComponent {
       return null;
     }
 
+    const now = this.state.now
     const timePoints = this.getTimePoints(this.props.events)
     const sortedEvents = this.props.events.sort((a, b) => (
       a.dateTimeStart.valueOf() - b.dateTimeStart.valueOf()
@@ -76,8 +92,9 @@ export default class TimeLine extends PureComponent {
       const end = timePoints[i + 1]
       const eventsInBin = sortedEvents.filter(e => (e.dateTimeStart.valueOf() >= start.valueOf() &&
       e.dateTimeEnd <= end.valueOf()))
+      const isNow = start.valueOf() <= now.valueOf() && end.valueOf() > now.valueOf()
       bins.push(
-        <View style={styles.container} key={start.valueOf() + "" + end.valueOf()}>
+        <View style={[styles.container, isNow ? styles.nowBin : null]} key={start.valueOf() + "" + end.valueOf()}>
           <Text>{displayTimePoint(start)}</Text>
           <View>
             {eventsInBin.map(e => {
@@ -138,6 +155,11 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     justifyContent: 'space-between'
+  },
+  nowBin: {
+    borderStyle: 'solid',
+    borderColor: 'red',
+    borderTopWidth: 3
   },
   marker: {
     height: 3,

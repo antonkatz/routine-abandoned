@@ -1,6 +1,7 @@
 // @flow
 
 import type {Routine} from './redux/store'
+import type {Event} from './schedule/schedule-types-constants'
 
 export function getDurationInMinutes(start: Date, end: Date): number {
   return Math.round((end.valueOf() - start.valueOf()) / 1000 / 60)
@@ -31,4 +32,8 @@ export function getRoutine(state: State, id: number): Routine {
 
 export function dateSorter(a: Date, b: Date) {
   return a.valueOf() - b.valueOf()
+}
+
+export function shiftEvent(original: Event, start: Date, end: Date): Event {
+  return Object.assign({}, original, {dateTimeStart: start, dateTimeEnd: end, duration: getDurationInMinutes(start, end)})
 }
