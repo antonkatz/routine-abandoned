@@ -20,6 +20,9 @@ import {displayTimePoint} from "../display-helpers"
 import {connect} from 'react-redux'
 import {convertConflictsIntoAlternatives, fillNonEventTime} from './schedule-data-logic'
 import ReactDOM from 'react-dom';
+import RaisedButton from 'material-ui/RaisedButton';
+import TimeBin from "./time-bin"
+import AddIcon from 'material-ui/svg-icons/content/add';
 
 export type TimeLineProps = {
   startTime: Date, endTime: Date, events: Array<Event>, routines: Array<Routine>, timeLineId: ?number
@@ -141,21 +144,6 @@ class TimeLineComponent extends React.Component {
     )
 
   }
-}
-
-const TimeBin = (props: {text: string, children: any, style: ?any}) => {
-  const fullStyle = [styles.bin]
-  if (props.style) {
-    fullStyle.push(props.style)
-  }
-  return (
-    <View style={fullStyle}>
-      <Text>{props.text}</Text>
-      <View>
-        {props.children}
-      </View>
-    </View>
-  )
 }
 
 function mapStateToProps(state: State, ownProps) {
