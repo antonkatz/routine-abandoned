@@ -45,8 +45,12 @@ export function updateEvents(state: State): State.appState {
 
   const events = processStatePlansToEvents(state.plans, getParentRoutineById, getRoutineChildren, getPlanById)
   const freeEvents = fillNonEventTime(events, state.appState.daysToDisplay, state.settings.dayLimits)
+  const withAlternatives = convertConflictsIntoAlternatives(events)
+  const displayEvents = [...withAlternatives.alternativeEvents, ...withAlternatives.events]
+  console.log("refresh", displayEvents)
 
-  const appState = Object.assign({}, state.appState, {events: events, freeTimeEvents: freeEvents})
+  const appState = Object.assign({}, state.appState,
+    {events: displayEvents, fundamentalEvents: events, freeTimeEvents: freeEvents})
   return appState
 }
 
@@ -75,20 +79,15 @@ routineChildFinder: (id: number) => Array<Routine>, getPlanById, parentEvent: ?E
       event = Object.assign({}, event, {
         includes: processStatePlansToEvents(includedPlans, routineFinder, routineChildFinder, getPlanById, event)
       })
-      // console.log("inc plans", includedPlans)
-      // console.log("eve" , event)
       return event
 
     })
   })
 
   // thus the events have to be reduced
-  const events = nestedEvents.reduce((a,b) => {
+  return nestedEvents.reduce((a,b) => {
     return a.concat(b)
   })
-
-  const withAlternatives = convertConflictsIntoAlternatives(events)
-  return [...withAlternatives.alternativeEvents, ...withAlternatives.events]
 }
 
 /** different plans have different types of repetition such as weekly (on the same week day) or daily (every _n_ days)
@@ -102,8 +101,8 @@ function getDates(plan: Plan, parentEvent: ?Event): Array<{start: Date, end: Dat
       start = getDateForWeeklyRepetition(r)
       end = new Date(start.valueOf() + r.duration * 60 * 1000)
     } else if (r.type === "parent" && r.timePositionType === 'relative') {
-      start = parentEvent.dateTimeStart
-      start = start.setHours(start.getHours() + r.hour, start.getMinutes() + r.minute)
+      start = new Date(parentEvent.dateTimeStart.valueOf())
+      start.setHours(start.getHours() + r.hour, start.getMinutes() + r.minute)
       end = new Date(start.valueOf() + r.duration * 60 * 1000)
     } else {
       throw new Error("Not supported")
@@ -168,7 +167,7 @@ function convertConflictsIntoAlternatives(events: Array<Event>): {
       const start = new Date(splitAt[i])
       const end = new Date(splitAt[i+1])
       const duration = getDurationInMinutes(start, end)
-      const newEvent: Event = Object.assign({}, e, {id: e.id + i,
+      const newEvent: Event = Object.assign({}, e, {id: e.id,
         dateTimeStart: start, dateTimeEnd: end, duration: duration})
       newEvents.push(newEvent)
     }
