@@ -39,11 +39,11 @@ export type RoutineStats = Array<RoutineStat>
 
 export type Plan = {+id: number, +parentRoutineId: number, +title?: string, +repetition: Array<PlanRepetition>,
   +color?: RoutineColor, +includeRoutines: Array<number>, +excludeRoutines: Array<number>,
-  +includePlans: Array<Plan>
+  +includePlans: Array<Plan>, +parentPlanId?: number
 }
 export type TimePosition = {timePositionType: 'absolute' | 'relative'}
 
-export type PlanRepetition = {type: string, +duration: number} & (DailyPlanRepetition | WeeklyPlanRepetition | SinglePlanRepetition)
+export type PlanRepetition = {type: string, +duration: number} & (DailyPlanRepetition | WeeklyPlanRepetition | SinglePlanRepetition | ParentPlanRepetition)
 /** @property weekday 0 is sunday */
 export type WeeklyPlanRepetition = TimePoint & TimePosition & {+type: "weekly", +weekday: number}
 export type DailyPlanRepetition = TimePoint & TimePosition & {+type: "daily", +from: Date, +every: number}
@@ -93,14 +93,15 @@ export const testData: State = {
       goals: [], color: ROUTINE_COLORS[6]}
   ],
   plans: [
-    {id: 1, parentRoutineId: 1, includeRoutines: [], excludeRoutines: [], includePlans: [], repetition: [
-      {type: "weekly", weekday: 1, hour: 17, minute: 50, duration: 90}
+    {id: 1, parentRoutineId: 1, includeRoutines: [], excludeRoutines: [], includePlans: [3], repetition: [
+      {type: "weekly", weekday: 1, hour: 17, minute: 50, duration: 90, timePositionType: 'absolute'}
     ]},
     {id: 2, parentRoutineId: 4, includeRoutines: [], excludeRoutines: [], includePlans: [], repetition: [
-      {type: "weekly", weekday: 1, hour: 18, minute: 10, duration: 30}
+      {type: "weekly", weekday: 1, hour: 18, minute: 10, duration: 30, timePositionType: 'absolute'}
     ]},
-
+    {id: 3, parentRoutineId: 3, parentPlanId: 1, includeRoutines: [], excludeRoutines: [], includePlans: [],
+      repetition: [
+      {type: "parent", hour: 0, minute: 10, duration: 20, timePositionType: 'relative'}
+    ]}
   ]
 }
-
-//description: "lets add a long description and see how that affects the layout"

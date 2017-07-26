@@ -3,48 +3,60 @@
  */
 
 import React from "react";
-import {View, StyleSheet, Text} from "react-native";
+import {View, StyleSheet, Text, TouchableHighlight} from "react-native";
 import {minutesToDisplayTime} from "../display-helpers"
 import TimeLine from './timeline'
 import {DEFAULT_ROUTINE_COLOR} from '../color-constants'
 import Event from './event'
 import Icon from 'material-ui/svg-icons/action/swap-horiz';
+import {connect} from 'react-redux'
 
 type Props = {
   alternatives: Array<Event>
 }
 
-export default AlternativeEvent = (props: Props) => {
+const AlternativeEventComponent = (props: Props) => {
   return (
     <View style={styles.outerContainer}>
+      <View style={styles.iconContainer}>
+        <Icon/>
+      </View>
+      <View style={styles.innerContainer}>
       {props.alternatives.map(e => (
-        <View key={e.id} style={styles.innerContainer}>
-          <Icon/>
-          <Event {...e} style={styles.event}/>
-        </View>
+          <Event key={e.id} {...e} style={styles.event}/>
       ))}
-
+      </View>
     </View>
   )
 }
 
+function mapDispatchToProps(dispatch) {
+  return {
+
+  }
+}
+
+const AlternativeEvent = connect((state, ownProps) => (ownProps), mapDispatchToProps)(AlternativeEventComponent)
+export default AlternativeEvent
+
 const styles = StyleSheet.create({
   outerContainer: {
-    // borderLeftStyle: "dashed",
-    // borderLeftColor: "black",
-    // borderLeftWidth: 7
+    flexDirection: 'row',
+    flexWrap: 'nowrap'
   },
   innerContainer: {
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'column',
     flexWrap: 'nowrap',
-    alignItems: 'center'
+    justifyContent: 'center'
   },
   event: {
     flexGrow: 1,
     flexShrink: 0
   },
-  icon: {
+  iconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
     flexGrow: 0,
     flexShrink: 0
   }

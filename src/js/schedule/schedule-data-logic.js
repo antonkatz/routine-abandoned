@@ -35,19 +35,24 @@ export function updateEvents(state: State): State.appState {
     return found ? found : null
   }
 
+  function getPlanById(planId): Plan {
+    return state.plans.find(p => (p.id === planId))
+  }
+
   function getRoutineChildren(routineId): Array<Routine> {
     return getRoutineChildrenOrRoot(state, routineId)
   }
 
-  const events = processStatePlansToEvents(state.plans, getParentRoutineById, getRoutineChildren)
+  const events = processStatePlansToEvents(state.plans, getParentRoutineById, getRoutineChildren, getPlanById)
   const freeEvents = fillNonEventTime(events, state.appState.daysToDisplay, state.settings.dayLimits)
 
   const appState = Object.assign({}, state.appState, {events: events, freeTimeEvents: freeEvents})
   return appState
 }
 
-export function processStatePlansToEvents(plans: Array<Plan>, routineFinder: (id: number) => Routine,
-routineChildFinder: (id: number) => Array<Routine>, parentEvent: ?Event): Array<Event> {
+export function processStatePlansToEvents(allPlans: Array<Plan>, routineFinder: (id: number) => Routine,
+routineChildFinder: (id: number) => Array<Routine>, getPlanById, parentEvent: ?Event): Array<Event> {
+  const plans = parentEvent ? allPlans : allPlans.filter((p) => (!p.parentPlanId))
   if (plans.length === 0) {
     return []
   }
@@ -66,9 +71,12 @@ routineChildFinder: (id: number) => Array<Routine>, parentEvent: ?Event): Array<
         color: getColor(p, routineFinder),
         type: 'single'
       };
+      const includedPlans = p.includePlans.map(getPlanById)
       event = Object.assign({}, event, {
-        includes: processStatePlansToEvents(p.includePlans, routineFinder, routineChildFinder, event)
+        includes: processStatePlansToEvents(includedPlans, routineFinder, routineChildFinder, getPlanById, event)
       })
+      // console.log("inc plans", includedPlans)
+      // console.log("eve" , event)
       return event
 
     })
@@ -87,13 +95,20 @@ routineChildFinder: (id: number) => Array<Routine>, parentEvent: ?Event): Array<
  * given a plan, returns start date, end date, and duration in minutes */
 function getDates(plan: Plan, parentEvent: ?Event): Array<{start: Date, end: Date, duration: number}> {
   return plan.repetition.map((r: PlanRepetition) => {
+    let start = null
+    let end = null
+
     if (r.type === "weekly") {
-      const start = getDateForWeeklyRepetition(r)
-      const end = new Date(start.valueOf() + r.duration * 60 * 1000)
-      return {start: start, end: end, duration: r.duration}
+      start = getDateForWeeklyRepetition(r)
+      end = new Date(start.valueOf() + r.duration * 60 * 1000)
+    } else if (r.type === "parent" && r.timePositionType === 'relative') {
+      start = parentEvent.dateTimeStart
+      start = start.setHours(start.getHours() + r.hour, start.getMinutes() + r.minute)
+      end = new Date(start.valueOf() + r.duration * 60 * 1000)
     } else {
       throw new Error("Not supported")
     }
+    return {start: start, end: end, duration: r.duration}
   })
 }
 
@@ -153,9 +168,8 @@ function convertConflictsIntoAlternatives(events: Array<Event>): {
       const start = new Date(splitAt[i])
       const end = new Date(splitAt[i+1])
       const duration = getDurationInMinutes(start, end)
-      const newEvent: Event = {id: e.id + i, parentPlanId: e.parentPlanId,
-        dateTimeStart: start, dateTimeEnd: end, type: 'single',
-        title: e.title, routines: e.routines, color: e.color, duration: duration}
+      const newEvent: Event = Object.assign({}, e, {id: e.id + i,
+        dateTimeStart: start, dateTimeEnd: end, duration: duration})
       newEvents.push(newEvent)
     }
     return newEvents

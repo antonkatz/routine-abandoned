@@ -39,7 +39,7 @@ export default class Event extends Component {
             <View>{minutesToDisplayTime(this.props.duration)}</View>
           </View>
         </TouchableHighlight>
-        <TimeLine active={this.state.expanded} events={[]} routines={this.props.routines}
+        <TimeLine active={this.state.expanded} events={this.props.includes} routines={this.props.routines}
                   startTime={this.props.dateTimeStart} endTime={this.props.dateTimeEnd}/>
       </View>
     )
