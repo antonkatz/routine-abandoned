@@ -10,10 +10,15 @@ import TimeLine from './timeline'
 import {DEFAULT_ROUTINE_COLOR} from '../color-constants'
 import {Event as EventType} from './schedule-types-constants'
 import {connect} from 'react-redux'
-import {expandEventAction} from './schedule-reducers-actions'
+import {expandEventAction, registerEventDomAction} from './schedule-reducers-actions'
+import ReactDOM from 'react-dom';
 
 class EventComponent extends Component {
   props: EventType
+
+  componentDidMount() {
+    this.props.onMount(this.props.id, ReactDOM.findDOMNode(this))
+  }
 
   render() {
     return (
@@ -35,6 +40,9 @@ function mapDispatchToProps(dispatch) {
   return {
     onToggleExpand: (eventId, timeLineId) => () => {
       dispatch(expandEventAction(eventId, timeLineId))
+    },
+    onMount: (eventId, dom) => {
+      dispatch(registerEventDomAction(eventId, dom))
     }
   }
 }

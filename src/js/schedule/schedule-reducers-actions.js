@@ -3,7 +3,7 @@
 import {State} from '../redux/state'
 import {Action} from '../redux/actions'
 import {initializeState, processEventsIntoState} from './schedule-data-logic'
-import {expandEvent} from './schedule-display-logic'
+import {expandEvent, registerEventDom} from './schedule-display-logic'
 
 export const SCHEDULE_ACTION_PREFIX = "SCHEDULE_"
 
@@ -14,6 +14,8 @@ export const PROCESS_EVENTS_INTO_STATE = SCHEDULE_ACTION_PREFIX + "PROCESS_EVENT
 export const INITIALIZE_SCHEDULE_ACTION = SCHEDULE_ACTION_PREFIX + "INITIALIZE_SCHEDULE"
 
 export const EXPAND_EVENT = SCHEDULE_ACTION_PREFIX + "EXPAND_EVENT"
+
+export const REGISTER_EVENT_DOM = SCHEDULE_ACTION_PREFIX + "REGISTER_EVENT_DOM"
 
 export function initializeAction() {
   return {type: INITIALIZE_SCHEDULE_ACTION}
@@ -26,6 +28,10 @@ export function expandEventAction(eventId, timeLineId) {
   return {type: EXPAND_EVENT, eventId: eventId, timeLineId: timeLineId}
 }
 
+export function registerEventDomAction(eventId, dom) {
+  return {type: REGISTER_EVENT_DOM, eventId: eventId, dom: dom}
+}
+
 export const scheduleReducer = (state: State = [], action: Action): Array<State.appState> => {
   switch (action.type) {
     case INITIALIZE_SCHEDULE_ACTION:
@@ -36,6 +42,8 @@ export const scheduleReducer = (state: State = [], action: Action): Array<State.
       return newState
     case EXPAND_EVENT:
       return expandEvent(state, action.eventId, action.timeLineId)
+    case REGISTER_EVENT_DOM:
+      return registerEventDom(state, action.eventId, action.dom)
     default:
       (action: empty)
       return state

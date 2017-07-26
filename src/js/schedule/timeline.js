@@ -19,6 +19,7 @@ import {Routine} from '../redux/state'
 import {displayTimePoint} from "../display-helpers"
 import {connect} from 'react-redux'
 import {convertConflictsIntoAlternatives, fillNonEventTime} from './schedule-data-logic'
+import ReactDOM from 'react-dom';
 
 export type TimeLineProps = {
   startTime: Date, endTime: Date, events: Array<Event>, routines: Array<Routine>, timeLineId: ?number
@@ -29,7 +30,7 @@ class TimeLineComponent extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = {now: new Date(), setIntervalId: null}
+    this.state = {now: new Date(), setIntervalId: null, offsetBy: 0}
   }
 
   componentDidMount() {
@@ -37,6 +38,13 @@ class TimeLineComponent extends React.Component {
       this.interval = setInterval(() => {
         this.setState((old) => (Object.assign({}, old, {now: new Date()})))
       }, 1000 * 60)
+    }
+    if (this.props.matchOffset) {
+      const elem = ReactDOM.findDOMNode(this)
+      const selfOffset = elem.getBoundingClientRect().top
+      const offsetBy = this.props.matchOffset - selfOffset
+      elem.style.top = "calc(" + offsetBy + "px - 1em)"
+      this.setState(Object.assign({}, this.state, {offsetBy: offsetBy}))
     }
   }
 
@@ -169,7 +177,7 @@ const styles = StyleSheet.create({
   },
   binContainer: {
     flexDirection: 'column',
-    justifyContent: 'center'
+    justifyContent: 'flex-start'
   },
   nowBin: {
     borderStyle: 'solid',

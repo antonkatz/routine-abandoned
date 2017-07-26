@@ -8,7 +8,7 @@ import {StyleSheet} from 'react-native'
 
 export type Event = {
   +id: string, +type: 'single' | 'alternative',
-  +dateTimeStart: Date, +dateTimeEnd: Date, +duration: number, isRoot: boolean
+  +dateTimeStart: Date, +dateTimeEnd: Date, +duration: number, isRoot: boolean, dom: Array
 }
 
 export type SingleEvent = Event & {

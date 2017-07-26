@@ -72,7 +72,6 @@ routineChildFinder: (id: number) => Array<Routine>): Array<Event> {
   sortedPlans.forEach(p => {
     // each plan can have multiple repetitions
     const dates = getDates(p, events)
-    console.log("state to events, dates", p.title, dates)
     dates.forEach(d => {
       let event: SingleEvent = {
         id: '' + p.id + d.end.valueOf() + d.end.valueOf(),
@@ -272,7 +271,7 @@ function createFreeEvent(start: Date, end: Date) {
     id: FREE_TIME_EVENT_TITLE + start.valueOf() + end.valueOf(), parentPlanId: null,
     dateTimeStart: start, dateTimeEnd: end, title: FREE_TIME_EVENT_TITLE,
     routines: [], color: "rgba(255,255,255,255)", duration: duration,
-    type: 'single'}
+    type: 'single', isFreeTime: true}
 }
 
 function getRoutines(plan: Plan, routineChildFinder): Array<Routine> {

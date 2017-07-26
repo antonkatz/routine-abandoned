@@ -39,7 +39,7 @@ function DayComponent (props) {
            {props.timeLines.map(t => (
              <TimeLine key={t.timeLineId} timeLineId={t.timeLineId} events={t.events}
                        startTime={t.startTime} endTime={t.endTime}
-                       isCurrent={isToday} routines={t.routines}/>
+                       isCurrent={isToday} routines={t.routines} matchOffset={t.matchOffset} style={styles.timeLine}/>
            ))}
          </View>
        </View>
@@ -68,5 +68,6 @@ const styles = StyleSheet.create({
   timelineContainer: {
     flexDirection: 'row',
     flexWrap: 'nowrap',
-  }
+  },
+  timeLine: {position: 'relative'}
 })
