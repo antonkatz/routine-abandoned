@@ -20,8 +20,8 @@ export function refreshAction() {
   return {type: REFRESH_SCHEDULE_ACTION}
 }
 
-export function expandEventAction(eventId) {
-  return {type: EXPAND_EVENT, eventId: eventId}
+export function expandEventAction(eventId, timeLineId) {
+  return {type: EXPAND_EVENT, eventId: eventId, timeLineId: timeLineId}
 }
 
 export const scheduleReducer = (state: State = [], action: Action): Array<State.appState> => {
@@ -31,7 +31,7 @@ export const scheduleReducer = (state: State = [], action: Action): Array<State.
     case REFRESH_SCHEDULE_ACTION:
       return updateEvents(state)
     case EXPAND_EVENT:
-      return expandEvent(state, action.eventId)
+      return expandEvent(state, action.eventId, action.timeLineId)
     default:
       (action: empty)
       return state

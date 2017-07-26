@@ -16,7 +16,6 @@ export default RoutineEvent = (props) => {
       <View style={[eventStyles.colorBar, {backgroundColor: props.color ? props.color : DEFAULT_ROUTINE_COLOR}]}></View>
       <View style={eventStyles.innerContainer}>
         <View>{props.title}</View>
-        <TimeLine active={false}/>
       </View>
     </View>
   )

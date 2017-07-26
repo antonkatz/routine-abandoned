@@ -59,7 +59,9 @@ export type State = {
     +eventsToDisplay: Array<string>,
     +events: Array<Event>,
     // +fundamentalEvents: Array<Event>,
-    +freeTimeEvents: Array<Event>
+    +freeTimeEvents: Array<Event>,
+    +additionalTimeLines: Array<{startTime: Date, endTime: Date, timeLineId: number,
+      events: Array<Event>, routines: Array<Routine>, offsetTop: number}>
   },
   +settings: {
     dayLimits: {start: TimePoint, end: TimePoint}
@@ -77,7 +79,8 @@ export const testData: State = {
     eventsToDisplay: [],
     // fundamentalEvents: [],
     freeTimeEvents: [],
-    events: []
+    events: [],
+    additionalTimeLines: []
   },
   settings: {
     dayLimits: {start: {hour: 5, minute: 0}, end: {hour: 20, minute: 30}}

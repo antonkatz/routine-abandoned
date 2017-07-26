@@ -20,7 +20,7 @@ class EventComponent extends Component {
       <View style={styles.outerContainer}>
         <View
           style={[styles.colorBar, {backgroundColor: this.props.color ? this.props.color : DEFAULT_ROUTINE_COLOR}]}></View>
-        <TouchableHighlight onPress={this.props.onToggleExpand(this.props.id)}>
+        <TouchableHighlight onPress={this.props.onToggleExpand(this.props.id, this.props.timeLineId)}>
           <View style={styles.innerContainer}>
             <View>{this.props.title}</View>
             <View>{minutesToDisplayTime(this.props.duration)}</View>
@@ -33,8 +33,8 @@ class EventComponent extends Component {
 
 function mapDispatchToProps(dispatch) {
   return {
-    onToggleExpand: (eventId) => () => {
-      expandEventAction(eventId)
+    onToggleExpand: (eventId, timeLineId) => () => {
+      dispatch(expandEventAction(eventId, timeLineId))
     }
   }
 }

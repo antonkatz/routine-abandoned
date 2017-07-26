@@ -162,9 +162,6 @@ export function convertConflictsIntoAlternatives(events: Array<Event>): {
     // sorting so that the splitting can be simple
     splitAt = splitAt.sort((a,b) => a - b)
 
-    console.log("split at", splitAt, e)
-    console.log("start end within", startWithin, endWithin)
-
     // splitting
     const newEvents = []
     for (let i=0; i < splitAt.length -1; i++) {
@@ -177,8 +174,6 @@ export function convertConflictsIntoAlternatives(events: Array<Event>): {
     }
     return newEvents
   })
-
-  console.log("updated events", updatedEvents)
 
   // condensing into 1d array
   updatedEvents = updatedEvents.reduce((a,b) => [...a, ...b])

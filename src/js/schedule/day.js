@@ -36,13 +36,12 @@ function DayComponent (props) {
            <TimeLine events={props.events} startTime={getStartTime(props)} endTime={getEndTime(props)}
                      isCurrent={isToday}/>
 
-
+           {props.timeLines.map(t => (
+             <TimeLine key={t.timeLineId} timeLineId={t.timeLineId} events={t.events}
+                       startTime={t.startTime} endTime={t.endTime}
+                       isCurrent={isToday} routines={t.routines}/>
+           ))}
          </View>
-
-         {/*<TimeLine active={this.state.expanded} events={this.props.includes} routines={this.props.routines}*/}
-                   {/*startTime={this.props.dateTimeStart} endTime={this.props.dateTimeEnd}/>*/}
-
-
        </View>
     )
 }
@@ -50,8 +49,10 @@ function DayComponent (props) {
 function mapStateToProps(state: State, ownProps) {
   const allEvents = [...state.appState.events, ...state.appState.freeTimeEvents]
   const todaysEvents = filterEventsByDate(allEvents, ownProps.date)
+  const timeLines = state.appState.additionalTimeLines
+    .filter(t => t.startTime.toDateString() === (ownProps.date).toDateString())
   return {date: ownProps.date, dayLimits: state.settings.dayLimits,
-    events: todaysEvents}
+    events: todaysEvents, timeLines: timeLines}
 }
 
 const Day = connect(mapStateToProps)(DayComponent)
@@ -63,5 +64,9 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     minWidth: 100,
     backgroundColor: 'rgba(0,0,0,0.1)'
+  },
+  timelineContainer: {
+    flexDirection: 'row',
+    flexWrap: 'nowrap',
   }
 })

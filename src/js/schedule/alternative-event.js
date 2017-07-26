@@ -23,7 +23,7 @@ const AlternativeEventComponent = (props: Props) => {
       </View>
       <View style={styles.innerContainer}>
       {props.alternatives.map(e => (
-          <Event key={e.id} {...e} style={styles.event}/>
+          <Event key={e.id} {...e} style={styles.event} timeLineId={props.timeLineId}/>
       ))}
       </View>
     </View>

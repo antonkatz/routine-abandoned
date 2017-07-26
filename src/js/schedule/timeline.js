@@ -21,7 +21,7 @@ import {connect} from 'react-redux'
 import {convertConflictsIntoAlternatives, fillNonEventTime} from './schedule-data-logic'
 
 export type TimeLineProps = {
-  startTime: Date, endTime: Date, events: Array<Event>, active: Boolean, routines: Array<Routine>
+  startTime: Date, endTime: Date, events: Array<Event>, routines: Array<Routine>, timeLineId: ?number
 }
 
 class TimeLineComponent extends React.Component {
@@ -69,10 +69,6 @@ class TimeLineComponent extends React.Component {
   }
 
   render() {
-    if (this.props.active === false) {
-      return null;
-    }
-
     // slitting an event into two, for display purposes (showing current time marker)
     const now = this.state.now
     const events = [...this.props.events]
@@ -108,9 +104,9 @@ class TimeLineComponent extends React.Component {
         text={displayTimePoint(start)}>
             {eventsInBin.map(e => {
               if (e.type === 'single') {
-                return <Event key={e.id} {...e}/>
+                return <Event key={e.id} {...e} timeLineId={this.props.timeLineId} />
               } else if (e.type == 'alternative') {
-                return <AlternativeEvent key={e.id} {...e}/>
+                return <AlternativeEvent key={e.id} {...e} timeLineId={this.props.timeLineId}/>
               }
             })}
         </TimeBin>
@@ -131,7 +127,7 @@ class TimeLineComponent extends React.Component {
     }
 
     return (
-      <View>
+      <View style={styles.binContainer}>
         {bins}
       </View>
     )
@@ -140,7 +136,7 @@ class TimeLineComponent extends React.Component {
 }
 
 const TimeBin = (props: {text: string, children: any, style: ?any}) => {
-  const fullStyle = [styles.binContainer]
+  const fullStyle = [styles.bin]
   if (props.style) {
     fullStyle.push(props.style)
   }
@@ -156,7 +152,6 @@ const TimeBin = (props: {text: string, children: any, style: ?any}) => {
 
 function mapStateToProps(state: State, ownProps) {
   const withAlternatives = convertConflictsIntoAlternatives(ownProps.events)
-  console.log("with alt", withAlternatives)
   const freeTime = fillNonEventTime(withAlternatives, ownProps.startTime, ownProps.endTime)
 
   return Object.assign({}, ownProps, {events: [...withAlternatives, ...freeTime]})
@@ -166,10 +161,15 @@ const TimeLine = connect(mapStateToProps)(TimeLineComponent)
 export default TimeLine
 
 const styles = StyleSheet.create({
-  binContainer: {
-    flex: 1,
+  bin: {
+    flexShrink: 1,
+    flexGrow: 0,
     flexDirection: 'column',
-    justifyContent: 'space-between'
+    justifyContent: 'flex-start'
+  },
+  binContainer: {
+    flexDirection: 'column',
+    justifyContent: 'center'
   },
   nowBin: {
     borderStyle: 'solid',
