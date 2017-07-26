@@ -11,14 +11,15 @@ export function expandEvent(state: State, eventId, timeLineId): State.appState {
   let timeLines = []
   let nextId = 1
   if (timeLineId) {
-    timeLines = state.appState.additionalTimeLines.filter(t => (t.timeLineId > timeLineId))
+    timeLines = state.appState.additionalTimeLines.filter(t => (t.timeLineId <= timeLineId))
     nextId += timeLineId
   }
 
   // push a new one
   const event: Event = state.appState.events.find(e => (e.id === eventId))
+  const childEvents = state.appState.events.filter(e => (e.parentEventId === eventId))
   const nextTimeLine = {startTime: event.dateTimeStart, endTime: event.dateTimeEnd, timeLineId: nextId,
-    events: event.includes, routines: event.routines, offsetTop: 0}
+    events: childEvents, routines: event.routines, parentEventId: event.id, offsetTop: 0}
 
   timeLines.push(nextTimeLine)
   const appState = Object.assign({}, state.appState, {additionalTimeLines: timeLines})

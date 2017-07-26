@@ -29,7 +29,7 @@ function getDatesOfWeek() {
 
 /* Converting plans into concrete events */
 
-export function updateEvents(state: State): State.appState {
+export function processEventsIntoState(state: State, rootEventId: ?number): State.appState {
   function getParentRoutineById (routineId): Routine {
     const found = state.routines.find(r => (r.id === routineId))
     return found ? found : null
@@ -44,26 +44,42 @@ export function updateEvents(state: State): State.appState {
   }
 
   const events = processStatePlansToEvents(state.plans, getParentRoutineById, getRoutineChildren, getPlanById)
-  // const freeEvents = fillNonEventTime(events, state.appState.daysToDisplay, state.settings.dayLimits)
 
-  const appState = Object.assign({}, state.appState,
-    {events: events, freeTimeEvents: []})
+  const appState = Object.assign({}, state.appState, {events: events})
   return appState
 }
 
-function processStatePlansToEvents(allPlans: Array<Plan>, routineFinder: (id: number) => Routine,
-routineChildFinder: (id: number) => Array<Routine>, getPlanById, parentEvent: ?Event): Array<Event> {
-  const plans = parentEvent ? allPlans : allPlans.filter((p) => (!p.parentPlanId))
+function processStatePlansToEvents(plans: Array<Plan>, routineFinder: (id: number) => Routine,
+routineChildFinder: (id: number) => Array<Routine>): Array<Event> {
   if (plans.length === 0) {
     return []
   }
+  // making sure that a plan is not processed before a parent plan's events are not created
+  const sortedPlans = []
+  const unsortedPlans = [...plans]
+  while (unsortedPlans.length > 0) {
+    const p = unsortedPlans.splice(0, 1)[0]
+    this.setTimeout(1000)
+    if (!p.parentPlanId || sortedPlans.findIndex(sorted => (sorted.id === p.parentPlanId)) > -1) {
+      sortedPlans.push(p)
+    } else {
+      unsortedPlans.push(p)
+    }
+  }
+
+  const events = []
   // processing plans into individual events
-  const nestedEvents: Array<Array<SingleEvent>> = plans.map(p => {
+  sortedPlans.forEach(p => {
     // each plan can have multiple repetitions
-    return getDates(p, parentEvent).map(d => {
+    const dates = getDates(p, events)
+    console.log("state to events, dates", p.title, dates)
+    dates.forEach(d => {
       let event: SingleEvent = {
         id: '' + p.id + d.end.valueOf() + d.end.valueOf(),
         parentPlanId: p.id,
+        parentRepetitionId: d.repetitionId,
+        parentEventId: d.parentEventId,
+        isRoot: !p.parentPlanId,
         dateTimeStart: d.start,
         dateTimeEnd: d.end,
         duration: d.duration,
@@ -72,40 +88,36 @@ routineChildFinder: (id: number) => Array<Routine>, getPlanById, parentEvent: ?E
         color: getColor(p, routineFinder),
         type: 'single'
       };
-      const includedPlans = p.includePlans.map(getPlanById)
-      event = Object.assign({}, event, {
-        includes: processStatePlansToEvents(includedPlans, routineFinder, routineChildFinder, getPlanById, event)
-      })
-      return event
-
+      events.push(event)
     })
   })
 
   // thus the events have to be reduced
-  return nestedEvents.reduce((a,b) => {
-    return a.concat(b)
-  })
+  return events
 }
 
 /** different plans have different types of repetition such as weekly (on the same week day) or daily (every _n_ days)
  * given a plan, returns start date, end date, and duration in minutes */
-function getDates(plan: Plan, parentEvent: ?Event): Array<{start: Date, end: Date, duration: number}> {
-  return plan.repetition.map((r: PlanRepetition) => {
-    let start = null
-    let end = null
-
+function getDates(plan: Plan, allEvents: Array<Event>): Array<{start: Date, end: Date, duration: number}> {
+  const nestedRepetitions = plan.repetition.map((r: PlanRepetition) => {
     if (r.type === "weekly") {
-      start = getDateForWeeklyRepetition(r)
-      end = new Date(start.valueOf() + r.duration * 60 * 1000)
+      const start = getDateForWeeklyRepetition(r)
+      const end = new Date(start.valueOf() + r.duration * 60 * 1000)
+      return [{start: start, end: end, duration: r.duration, parentRepetitionId: r.repetitionId, parentEventId: null}]
     } else if (r.type === "parent" && r.timePositionType === 'relative') {
-      start = new Date(parentEvent.dateTimeStart.valueOf())
-      start.setHours(start.getHours() + r.hour, start.getMinutes() + r.minute)
-      end = new Date(start.valueOf() + r.duration * 60 * 1000)
+      const parentEvents = allEvents.filter(e => (plan.parentPlanId === e.parentPlanId))
+      return parentEvents.map(pEv => {
+        let start = new Date(pEv.dateTimeStart.valueOf())
+        start.setHours(start.getHours() + r.hour, start.getMinutes() + r.minute)
+        let end = new Date(start.valueOf() + r.duration * 60 * 1000)
+        return {start: start, end: end, duration: r.duration, parentRepetitionId: r.repetitionId, parentEventId: pEv.id}
+      })
     } else {
       throw new Error("Not supported")
     }
-    return {start: start, end: end, duration: r.duration}
   })
+
+  return nestedRepetitions.reduce((a,b) => ([...a, ...b]))
 }
 
 function getDateForWeeklyRepetition(r: WeeklyPlanRepetition): Date {

@@ -8,12 +8,12 @@ import {StyleSheet} from 'react-native'
 
 export type Event = {
   +id: string, +type: 'single' | 'alternative',
-  +dateTimeStart: Date, +dateTimeEnd: Date, +duration: number
+  +dateTimeStart: Date, +dateTimeEnd: Date, +duration: number, isRoot: boolean
 }
 
 export type SingleEvent = Event & {
-  parentPlanId: ?number, type: 'single',
-  title: string, routines: Array<Routine>, color: RoutineColor, includes: Array<Event>
+  parentPlanId: number, parentRepetitionId: string, parentEventId: string, type: 'single',
+  title: string, routines: Array<Routine>, color: RoutineColor
 }
 
 export type AlternativeEvents =  Event & {

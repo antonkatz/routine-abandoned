@@ -47,8 +47,8 @@ function DayComponent (props) {
 }
 
 function mapStateToProps(state: State, ownProps) {
-  const allEvents = [...state.appState.events, ...state.appState.freeTimeEvents]
-  const todaysEvents = filterEventsByDate(allEvents, ownProps.date)
+  const rootEvents = state.appState.events.filter(e => (e.isRoot))
+  const todaysEvents = filterEventsByDate(rootEvents, ownProps.date)
   const timeLines = state.appState.additionalTimeLines
     .filter(t => t.startTime.toDateString() === (ownProps.date).toDateString())
   return {date: ownProps.date, dayLimits: state.settings.dayLimits,

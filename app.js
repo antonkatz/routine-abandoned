@@ -12,13 +12,13 @@ import {testData} from './src/js/redux/state'
 import AppDisplay from './src/js/app-display'
 import {Text} from 'react-native'
 import injectTapEventPlugin from 'react-tap-event-plugin';
-import {initializeAction, refreshAction} from './src/js/schedule/schedule-reducers-actions'
+import {initializeAction, processEventsIntoStateAction} from './src/js/schedule/schedule-reducers-actions'
 
 injectTapEventPlugin();
 
 const store = createStore(routineApp, testData);
 store.dispatch(initializeAction())
-store.dispatch(refreshAction())
+store.dispatch(processEventsIntoStateAction())
 
 export default class ExampleApp extends Component {
   render() {

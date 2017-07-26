@@ -39,7 +39,7 @@ const appState = (state: State, action: Action): Array<State.appState> => {
   switch (action.type.startsWith(SCHEDULE_ACTION_PREFIX)) {
     case true:
       const newState = scheduleReducer(state, action)
-      console.log("new state", newState)
+      console.log("root schedule reducer", newState, action)
       return newState
     default:
       (action: empty)
