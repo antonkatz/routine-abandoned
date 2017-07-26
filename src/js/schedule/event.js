@@ -9,42 +9,38 @@ import {minutesToDisplayTime} from "../display-helpers"
 import TimeLine from './timeline'
 import {DEFAULT_ROUTINE_COLOR} from '../color-constants'
 import {Event as EventType} from './schedule-types-constants'
+import {connect} from 'react-redux'
+import {expandEventAction} from './schedule-reducers-actions'
 
-export default class Event extends Component {
+class EventComponent extends Component {
   props: EventType
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      expanded: false
-    };
-
-    this.toggleExpand = this.toggleExpand.bind(this);
-  }
-
-  toggleExpand() {
-    this.setState(pState => {
-      return {expanded: !pState.expanded}
-    })
-  }
 
   render() {
     return (
       <View style={styles.outerContainer}>
         <View
           style={[styles.colorBar, {backgroundColor: this.props.color ? this.props.color : DEFAULT_ROUTINE_COLOR}]}></View>
-        <TouchableHighlight onPress={this.toggleExpand}>
+        <TouchableHighlight onPress={this.props.onToggleExpand(this.props.id)}>
           <View style={styles.innerContainer}>
             <View>{this.props.title}</View>
             <View>{minutesToDisplayTime(this.props.duration)}</View>
           </View>
         </TouchableHighlight>
-        <TimeLine active={this.state.expanded} events={this.props.includes} routines={this.props.routines}
-                  startTime={this.props.dateTimeStart} endTime={this.props.dateTimeEnd}/>
       </View>
     )
   }
 }
+
+function mapDispatchToProps(dispatch) {
+  return {
+    onToggleExpand: (eventId) => () => {
+      expandEventAction(eventId)
+    }
+  }
+}
+
+const Event = connect((s, ownProps) => (ownProps), mapDispatchToProps)(EventComponent)
+export default Event
 
 const styles = StyleSheet.create({
   outerContainer: {

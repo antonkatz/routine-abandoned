@@ -58,7 +58,7 @@ export type State = {
     +displayAllEvents: Boolean,
     +eventsToDisplay: Array<string>,
     +events: Array<Event>,
-    +fundamentalEvents: Array<Event>,
+    // +fundamentalEvents: Array<Event>,
     +freeTimeEvents: Array<Event>
   },
   +settings: {
@@ -75,7 +75,7 @@ export const testData: State = {
     daysToDisplay: [],
     displayAllEvents: true,
     eventsToDisplay: [],
-    fundamentalEvents: [],
+    // fundamentalEvents: [],
     freeTimeEvents: [],
     events: []
   },

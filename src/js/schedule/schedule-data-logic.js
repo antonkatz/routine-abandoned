@@ -44,17 +44,14 @@ export function updateEvents(state: State): State.appState {
   }
 
   const events = processStatePlansToEvents(state.plans, getParentRoutineById, getRoutineChildren, getPlanById)
-  const freeEvents = fillNonEventTime(events, state.appState.daysToDisplay, state.settings.dayLimits)
-  const withAlternatives = convertConflictsIntoAlternatives(events)
-  const displayEvents = [...withAlternatives.alternativeEvents, ...withAlternatives.events]
-  console.log("refresh", displayEvents)
+  // const freeEvents = fillNonEventTime(events, state.appState.daysToDisplay, state.settings.dayLimits)
 
   const appState = Object.assign({}, state.appState,
-    {events: displayEvents, fundamentalEvents: events, freeTimeEvents: freeEvents})
+    {events: events, freeTimeEvents: []})
   return appState
 }
 
-export function processStatePlansToEvents(allPlans: Array<Plan>, routineFinder: (id: number) => Routine,
+function processStatePlansToEvents(allPlans: Array<Plan>, routineFinder: (id: number) => Routine,
 routineChildFinder: (id: number) => Array<Routine>, getPlanById, parentEvent: ?Event): Array<Event> {
   const plans = parentEvent ? allPlans : allPlans.filter((p) => (!p.parentPlanId))
   if (plans.length === 0) {
@@ -125,21 +122,26 @@ function getDateForWeeklyRepetition(r: WeeklyPlanRepetition): Date {
   return repeatOn
 }
 
-function convertConflictsIntoAlternatives(events: Array<Event>): {
+export function convertConflictsIntoAlternatives(events: Array<Event>): {
   events: Array<Event>, alternativeEvents: Array<AlternativeEvents>
 } {
+  if (events.length === 0) {
+    return events
+  }
   let updatedEvents: Array<Array<Event>> = events.map(e => {
     // finding conflicting events
     const startWithin = events.filter(inConflict => (
-      e.dateTimeStart.valueOf() <= inConflict.dateTimeStart.valueOf() && e.dateTimeEnd.valueOf() >= inConflict.dateTimeStart
+      e.dateTimeStart.valueOf() <= inConflict.dateTimeStart.valueOf() && e.dateTimeEnd.valueOf() >= inConflict.dateTimeStart &&
+        e.id !== inConflict.id
     ))
     const endWithin = events.filter(inConflict => (
-      e.dateTimeStart.valueOf() <= inConflict.dateTimeStart.valueOf() && e.dateTimeEnd.valueOf() >= inConflict.dateTimeStart
+      e.dateTimeStart.valueOf() <= inConflict.dateTimeStart.valueOf() && e.dateTimeEnd.valueOf() >= inConflict.dateTimeStart &&
+      e.id !== inConflict.id
     ))
 
     // if no there are no conflicts, continue
     if (startWithin.length === 0 && endWithin.length === 0) {
-      return []
+      return [e]
     }
 
     // figuring out at which points to split the original event
@@ -160,6 +162,8 @@ function convertConflictsIntoAlternatives(events: Array<Event>): {
     // sorting so that the splitting can be simple
     splitAt = splitAt.sort((a,b) => a - b)
 
+    console.log("split at", splitAt, e)
+    console.log("start end within", startWithin, endWithin)
 
     // splitting
     const newEvents = []
@@ -173,6 +177,8 @@ function convertConflictsIntoAlternatives(events: Array<Event>): {
     }
     return newEvents
   })
+
+  console.log("updated events", updatedEvents)
 
   // condensing into 1d array
   updatedEvents = updatedEvents.reduce((a,b) => [...a, ...b])
@@ -201,24 +207,20 @@ function convertConflictsIntoAlternatives(events: Array<Event>): {
     }
   }
 
-  return {events: normalEvents, alternativeEvents: alternativeEvents}
+  return [...normalEvents, ...alternativeEvents]
 }
 
-function fillNonEventTime(events: Array<Event>, daysToDisplay, dayLimits): Array<Event> {
-  const nestedFreeEvents = daysToDisplay.map(date => {
-    const eventsOnDate = filterEventsByDate(events, date)
-    let upperPoint = getDateWithSetTime(date, dayLimits.start.hour,
-      dayLimits.start.minute)
+export function fillNonEventTime(events: Array<Event>, start: Date, end: Date): Array<Event> {
+    let upperPoint = start
     let currentPoint: Date = upperPoint
-    const lowestPoint = getDateWithSetTime(date, dayLimits.end.hour,
-      dayLimits.end.minute)
+    const lowestPoint = end
 
     const freeTimeBlocks = []
-    if (eventsOnDate.length === 0) {
+    if (events.length === 0) {
       freeTimeBlocks.push(createFreeEvent(upperPoint, lowestPoint))
     } else {
       while (currentPoint.valueOf() < lowestPoint.valueOf()) {
-        const nextSortedEvents = eventsOnDate.map(e => (
+        const nextSortedEvents = events.map(e => (
           Object.assign({}, {diff: e.dateTimeStart.valueOf() - currentPoint.valueOf()}, e)
         ))
         // filtering out events that happen before the current point
@@ -255,9 +257,6 @@ function fillNonEventTime(events: Array<Event>, daysToDisplay, dayLimits): Array
     }
 
     return freeTimeBlocks
-  })
-
-  return nestedFreeEvents.reduce((a,b) => ([...a, ...b]))
 }
 
 function createFreeEvent(start: Date, end: Date) {

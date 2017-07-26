@@ -17,12 +17,14 @@ import AlternativeEvent from './alternative-event'
 import {dateSorter, shiftEvent} from '../helpers'
 import {Routine} from '../redux/state'
 import {displayTimePoint} from "../display-helpers"
+import {connect} from 'react-redux'
+import {convertConflictsIntoAlternatives, fillNonEventTime} from './schedule-data-logic'
 
 export type TimeLineProps = {
   startTime: Date, endTime: Date, events: Array<Event>, active: Boolean, routines: Array<Routine>
 }
 
-export default class TimeLine extends React.Component {
+class TimeLineComponent extends React.Component {
   props: TimeLineProps
 
   constructor(props) {
@@ -74,8 +76,9 @@ export default class TimeLine extends React.Component {
     // slitting an event into two, for display purposes (showing current time marker)
     const now = this.state.now
     const events = [...this.props.events]
-    const currentEvent = events.findIndex(e => (e.dateTimeStart.valueOf() <= now.valueOf() &&
-    e.dateTimeEnd.valueOf() >= now.valueOf()))
+    const currentEvent = events.findIndex(e => {
+      return e.dateTimeStart.valueOf() <= now.valueOf() && e.dateTimeEnd.valueOf() >= now.valueOf()
+    })
     if (currentEvent > -1) {
       const e = events[currentEvent]
       const topEvent = shiftEvent(e, e.dateTimeStart, now)
@@ -150,6 +153,17 @@ const TimeBin = (props: {text: string, children: any, style: ?any}) => {
     </View>
   )
 }
+
+function mapStateToProps(state: State, ownProps) {
+  const withAlternatives = convertConflictsIntoAlternatives(ownProps.events)
+  console.log("with alt", withAlternatives)
+  const freeTime = fillNonEventTime(withAlternatives, ownProps.startTime, ownProps.endTime)
+
+  return Object.assign({}, ownProps, {events: [...withAlternatives, ...freeTime]})
+}
+
+const TimeLine = connect(mapStateToProps)(TimeLineComponent)
+export default TimeLine
 
 const styles = StyleSheet.create({
   binContainer: {

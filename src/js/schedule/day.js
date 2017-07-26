@@ -32,8 +32,16 @@ function DayComponent (props) {
           <ToolbarTitle text={title}></ToolbarTitle>
         </Toolbar>
 
-        <TimeLine events={props.events} startTime={getStartTime(props)} endTime={getEndTime(props)}
-                  isCurrent={isToday}/>
+         <View style={styles.timelineContainer}>
+           <TimeLine events={props.events} startTime={getStartTime(props)} endTime={getEndTime(props)}
+                     isCurrent={isToday}/>
+
+
+         </View>
+
+         {/*<TimeLine active={this.state.expanded} events={this.props.includes} routines={this.props.routines}*/}
+                   {/*startTime={this.props.dateTimeStart} endTime={this.props.dateTimeEnd}/>*/}
+
 
        </View>
     )
