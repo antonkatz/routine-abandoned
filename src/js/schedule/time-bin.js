@@ -35,7 +35,9 @@ const TimeBinComponent = (props: {text: string, children: any, style: ?any}) => 
     <View style={fullStyle}>
       <View style={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', justifyContent: "space-between", alignItems: 'flex-end'}}>
         <Text>{props.text}</Text>
-        {props.createEventMode && <RaisedButton icon={icon} primary={true} style={{flexGrow: 0, flexShrink: 1, minWidth: 0, height: 'auto', lineHeight: 'unset'}}/>}
+        {props.createPlanMode && props.onCreateNew && <RaisedButton icon={icon} primary={true}
+                                                                    style={{flexGrow: 0, flexShrink: 1, minWidth: 0, height: 'auto', lineHeight: 'unset'}}
+                                                                    onTouchTap={props.onCreateNew}/>}
       </View>
       <View>
         {props.children}
@@ -45,13 +47,12 @@ const TimeBinComponent = (props: {text: string, children: any, style: ?any}) => 
 }
 
 function mapStateToProps(state: State, ownProps) {
-  const props = Object.assign({}, ownProps, {createEventMode: state.appState.createEventMode.on})
+  const props = Object.assign({}, ownProps, {createPlanMode: state.appState.createPlanMode.on})
   return props
 }
 
 function mapDispatchToProps(dispatch) {
   return {
-    onCreateNew: null
   }
 }
 

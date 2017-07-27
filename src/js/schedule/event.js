@@ -17,15 +17,15 @@ class EventComponent extends Component {
   props: EventType
 
   componentDidMount() {
-    this.props.onMount(this.props.id, ReactDOM.findDOMNode(this))
-  }
-
-  compoenentDidUpdate() {
-    this.props.onMount(this.props.id, ReactDOM.findDOMNode(this))
+    if (!this.props.isEtherEvent) {
+      this.props.onMount(this.props.id, ReactDOM.findDOMNode(this))
+    }
   }
 
   componentWillUnmount() {
-    this.props.onUnmount(this.props.id, ReactDOM.findDOMNode(this))
+    if (!this.props.isEtherEvent) {
+      this.props.onUnmount(this.props.id, ReactDOM.findDOMNode(this))
+    }
   }
 
   render() {

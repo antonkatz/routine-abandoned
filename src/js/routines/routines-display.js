@@ -137,6 +137,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column'
   },
   routinesList : {
-    flexDirection: 'row'
+    flexDirection: 'row',
+    flexWrap: 'wrap'
   }
 })

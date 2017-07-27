@@ -6,7 +6,7 @@ import { combineReducers } from 'redux'
 import {ADD_ROUTINE} from "./actions";
 import type {Action, AddRoutineAction} from "./actions";
 import type {Routine, Plan, State} from './state'
-import {SCHEDULE_ACTION_PREFIX, scheduleReducer} from '../schedule/schedule-reducers-actions'
+import {SCHEDULE_ACTION_PREFIX, scheduleReducer, scheduleReducerFullState} from '../schedule/schedule-reducers-actions'
 
 const routines = (state: Array<Routine> = [], action: Action): Array<Routine> => {
   switch (action.type) {
@@ -47,18 +47,32 @@ const appState = (state: State, action: Action): Array<State.appState> => {
   }
 }
 
+
+const fullState = (state: State, action: Action): Array<State> => {
+  switch (action.type.startsWith(SCHEDULE_ACTION_PREFIX)) {
+    case true:
+      const newState = scheduleReducerFullState(state, action)
+      // console.log("root full state schedule reducer", newState, action)
+      return newState
+    default:
+      (action: empty)
+      return state
+  }
+}
+
 const routineApp = function (state: State, action: Action) {
   if (!action) {
     return state
   }
-  const newState = {
+  let newState = {
     routines: routines(state.routines, action),
     plans: plans(state.plans, action),
     settings: settings(state.settings, action),
     appState: state.appState
   }
-  const withAppState = Object.assign({}, newState, {appState: appState(newState, action)})
-  return withAppState
+  newState = Object.assign({}, newState, {appState: appState(newState, action)})
+  newState = Object.assign({}, newState, fullState(newState, action))
+  return newState
 }
 
 export {routineApp}

@@ -13,7 +13,7 @@ export type Event = {
 
 export type SingleEvent = Event & {
   parentPlanId: number, parentRepetitionId: string, parentEventId: string, type: 'single',
-  title: string, routines: Array<Routine>, color: RoutineColor
+  title: string, routines: Array<Routine>, color: RoutineColor, editMode: boolean
 }
 
 export type AlternativeEvents =  Event & {

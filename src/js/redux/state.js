@@ -62,8 +62,8 @@ export type State = {
     // +fundamentalEvents: Array<Event>,
     +freeTimeEvents: Array<Event>,
     +additionalTimeLines: Array<{startTime: Date, endTime: Date, timeLineId: number,
-      events: Array<Event>, routines: Array<Routine>, offsetTop: number}>,
-    +createEventMode: {
+      events: Array<Event>, routines: Array<Routine>, matchOffset: number, parentEventId: string}>,
+    +createPlanMode: {
       on: boolean,
       routineId: ?number
     }
@@ -86,9 +86,9 @@ export const testData: State = {
     freeTimeEvents: [],
     events: [],
     additionalTimeLines: [],
-    createEventMode: {
+    createPlanMode: {
       on: true,
-      routineId: null
+      routineId: 2
     }
   },
   settings: {

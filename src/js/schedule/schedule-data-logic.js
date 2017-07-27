@@ -270,7 +270,7 @@ function createFreeEvent(start: Date, end: Date) {
     id: FREE_TIME_EVENT_TITLE + start.valueOf() + end.valueOf(), parentPlanId: null,
     dateTimeStart: start, dateTimeEnd: end, title: FREE_TIME_EVENT_TITLE,
     routines: [], color: "rgba(255,255,255,255)", duration: duration,
-    type: 'single', isFreeTime: true}
+    type: 'single', isFreeTime: true, isEtherEvent: true}
 }
 
 function getRoutines(plan: Plan, routineChildFinder): Array<Routine> {
@@ -284,4 +284,28 @@ function getTitle(plan: Plan, routineFinder): string {
 function getColor(plan: Plan, routineFinder): RoutineColor {
   const c = plan.color ? plan.color : routineFinder(plan.parentRoutineId).color
   return c ? c : DEFAULT_ROUTINE_COLOR
+}
+
+export function createPlan(state: State, time: Date, timeLineId) {
+  const hour = time.getHours()
+  const minute = time.getMinutes()
+  const duration = 60
+
+
+  const repType = 'weekly'
+  const timePositionType = 'absolute'
+  const weekDay = time.getDay()
+
+  const repetitionId = repType + timePositionType + hour + minute + duration
+  const repetition = {type: repType, weekday: weekDay, hour: hour, minute: minute, duration: duration,
+    timePositionType: timePositionType, repetitionId: repetitionId}
+
+  const id = Math.max(...state.plans.map(p => (p.id))) + 1
+  const parentRoutineId = state.appState.createPlanMode.routineId
+  const newPlan = {id: id, parentRoutineId: parentRoutineId, includeRoutines: [], excludeRoutines: [], includePlans: [],
+    repetition: [
+      repetition
+  ]}
+
+  return Object.assign({}, state, {plans: [...state.plans, newPlan]})
 }

@@ -24,6 +24,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import TimeBin from "./time-bin"
 import AddIcon from 'material-ui/svg-icons/content/add';
 import { withRouter } from 'react-router'
+import {createPlanAction} from './schedule-reducers-actions'
 
 
 export type TimeLineProps = {
@@ -35,14 +36,14 @@ class TimeLineComponent extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = {now: new Date(), setIntervalId: null}
+    this.state = {now: new Date()}
   }
 
   componentDidMount() {
     if (this.props.isCurrent) {
       this.interval = setInterval(() => {
         this.setState((old) => (Object.assign({}, old, {now: new Date()})))
-      }, 1000 * 1)
+      }, 1000 * 60)
     }
     if (this.props.matchOffset) {
       const elem = ReactDOM.findDOMNode(this)
@@ -87,7 +88,9 @@ class TimeLineComponent extends React.Component {
     const now = this.state.now
     const events = [...this.props.events]
     const currentEvent = events.findIndex(e => {
-      return e.dateTimeStart.valueOf() <= now.valueOf() && e.dateTimeEnd.valueOf() >= now.valueOf()
+      // splitting in a display pleasing way -- at least a minute has passed
+      // starts before now, ends after now
+      return e.dateTimeStart.valueOf() <= (now.valueOf() - 60 * 1000) && e.dateTimeEnd.valueOf() >= now.valueOf()
     })
     if (currentEvent > -1) {
       const e = events[currentEvent]
@@ -115,10 +118,10 @@ class TimeLineComponent extends React.Component {
       const isNow = start.valueOf() <= now.valueOf() && end.valueOf() > now.valueOf()
       bins.push(
         <TimeBin style={isNow ? styles.nowBin : null} key={start.valueOf() + "" + end.valueOf()}
-        text={displayTimePoint(start)}>
+        text={displayTimePoint(start)} onCreateNew={this.props.onCreateNew(start)}>
             {eventsInBin.map(e => {
               if (e.type === 'single') {
-                return <Event key={e.id} {...e} timeLineId={this.props.timeLineId} />
+                return <Event key={e.id} {...e} timeLineId={this.props.timeLineId}/>
               } else if (e.type == 'alternative') {
                 return <AlternativeEvent key={e.id} {...e} timeLineId={this.props.timeLineId}/>
               }
@@ -156,7 +159,16 @@ function mapStateToProps(state: State, ownProps) {
   return Object.assign({}, ownProps, {events: [...withAlternatives, ...freeTime]})
 }
 
-const TimeLine = withRouter(connect(mapStateToProps)(TimeLineComponent))
+function mapDispatchToProps(dispatch, ownProps) {
+  return {
+    onCreateNew: (time: Date) => () => {
+      dispatch(createPlanAction(time, ownProps.timeLineId))
+    }
+  }
+}
+
+
+const TimeLine = connect(mapStateToProps, mapDispatchToProps)(TimeLineComponent)
 export default TimeLine
 
 const styles = StyleSheet.create({

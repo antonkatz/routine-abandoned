@@ -2,8 +2,8 @@
 
 import {State} from '../redux/state'
 import {Action} from '../redux/actions'
-import {initializeState, processEventsIntoState} from './schedule-data-logic'
-import {expandEvent, registerEventDom, enterCreateEventMode} from './schedule-display-logic'
+import {initializeState, processEventsIntoState, createPlan} from './schedule-data-logic'
+import {expandEvent, registerEventDom, enterCreatePlanMode} from './schedule-display-logic'
 
 export const SCHEDULE_ACTION_PREFIX = "SCHEDULE_"
 
@@ -17,7 +17,9 @@ export const EXPAND_EVENT = SCHEDULE_ACTION_PREFIX + "EXPAND_EVENT"
 
 export const REGISTER_EVENT_DOM = SCHEDULE_ACTION_PREFIX + "REGISTER_EVENT_DOM"
 
-export const ENTER_CREATE_EVENT_MODE = SCHEDULE_ACTION_PREFIX + "ENTER_CREATE_EVENT_MODE"
+export const ENTER_CREATE_PLAN_MODE = SCHEDULE_ACTION_PREFIX + "ENTER_CREATE_PLAN_MODE"
+
+export const CREATE_PLAN = SCHEDULE_ACTION_PREFIX + "CREATE_PLAN"
 
 export function initializeAction() {
   return {type: INITIALIZE_SCHEDULE_ACTION}
@@ -34,11 +36,15 @@ export function registerEventDomAction(eventId, dom, remove) {
   return {type: REGISTER_EVENT_DOM, eventId: eventId, dom: dom, remove: remove}
 }
 
-export function enterCreateEventModeAction(routineId) {
-  return {type: ENTER_CREATE_EVENT_MODE, routineId: routineId}
+export function enterCreatePlanModeAction(routineId) {
+  return {type: ENTER_CREATE_PLAN_MODE, routineId: routineId}
 }
 
-export const scheduleReducer = (state: State = [], action: Action): Array<State.appState> => {
+export function createPlanAction(time: Date, timeLineId) {
+  return {type: CREATE_PLAN, time: time, timeLineId: timeLineId}
+}
+
+export const scheduleReducer = (state: State, action: Action): Array<State.appState> => {
   switch (action.type) {
     case INITIALIZE_SCHEDULE_ACTION:
       return initializeState(state.appState);
@@ -49,10 +55,24 @@ export const scheduleReducer = (state: State = [], action: Action): Array<State.
       return expandEvent(state, action.eventId, action.timeLineId)
     case REGISTER_EVENT_DOM:
       return registerEventDom(state, action.eventId, action.dom, action.remove)
-    case ENTER_CREATE_EVENT_MODE:
-      const newStateCem = enterCreateEventMode(state, action.routineId)
-      console.log("crearte event mode state", newStateCem)
+    case ENTER_CREATE_PLAN_MODE:
+      const newStateCem = enterCreatePlanMode(state, action.routineId)
+      console.log(ENTER_CREATE_PLAN_MODE, newStateCem)
       return newStateCem
+    default:
+      (action: empty)
+      return state.appState
+  }
+}
+
+export const scheduleReducerFullState = (state: State, action: Action): Array<State> => {
+  switch (action.type) {
+    case CREATE_PLAN:
+      let newStateCe = createPlan(state, action.time, action.timeLineId)
+      const newAppState = processEventsIntoState(newStateCe, action.rootEventId)
+      newStateCe = Object.assign({}, newStateCe, {appState: newAppState})
+      console.log("create new plan reducer", newStateCe)
+      return newStateCe
     default:
       (action: empty)
       return state

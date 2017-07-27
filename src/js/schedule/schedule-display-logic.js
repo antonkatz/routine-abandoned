@@ -62,6 +62,6 @@ export function registerEventDom(state: State, eventId, dom, remove) {
   return newState
 }
 
-export function enterCreateEventMode(state, routineId) {
-  return Object.assign({}, state.appState, {createEventMode: {on: true, routineId: routineId}})
+export function enterCreatePlanMode(state, routineId) {
+  return Object.assign({}, state.appState, {createPlanMode: {on: true, routineId: routineId}})
 }

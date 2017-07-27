@@ -5,14 +5,13 @@ import type {State, Routine} from '../redux/state'
 import {addRoutine} from '../redux/actions'
 import {navigateToRoutineChildren} from './routines-controls'
 import {getRoutineChildrenOrRoot, getRoutine} from '../helpers'
-import {enterCreateEventModeAction} from '../schedule/schedule-reducers-actions'
+import {enterCreatePlanModeAction} from '../schedule/schedule-reducers-actions'
 
 function cleanRoutineId(dirtyId) {
   return dirtyId ? Number(dirtyId) : null
 }
 
 const mapStateToProps = (state: State, ownProps ) => {
-  console.log("map state to props", state, ownProps)
   const parentId = cleanRoutineId(ownProps.match.params.id)
   return {
     parentId: parentId,
@@ -31,7 +30,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
       dispatch(addRoutine(parentId, "new routine"))
     },
     onSchedule: parentId => {
-      dispatch(enterCreateEventModeAction(parentId))
+      dispatch(enterCreatePlanModeAction(parentId))
       ownProps.history.push("/")
     }
   }
