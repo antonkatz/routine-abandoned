@@ -66,6 +66,11 @@ export type State = {
     +createPlanMode: {
       on: boolean,
       routineId: ?number
+    },
+    +editEventMode: {
+      action: boolean,
+      eventId: string,
+      shiftBy: ?number
     }
   },
   +settings: {
@@ -89,6 +94,11 @@ export const testData: State = {
     createPlanMode: {
       on: true,
       routineId: 2
+    },
+    editEventMode: {
+      action: null,
+      eventId: null,
+      shiftBy: null
     }
   },
   settings: {

@@ -12,7 +12,7 @@ import {eventStyles} from './schedule-types-constants'
 
 export default RoutineEvent = (props) => {
   return (
-    <View style={eventStyles.outerContainer}>
+    <View style={eventStyles.paper}>
       <View style={[eventStyles.colorBar, {backgroundColor: props.color ? props.color : DEFAULT_ROUTINE_COLOR}]}></View>
       <View style={eventStyles.innerContainer}>
         <View>{props.title}</View>
@@ -22,7 +22,7 @@ export default RoutineEvent = (props) => {
 }
 
 const styles = StyleSheet.create({
-  outerContainer: {
+  paper: {
     display: 'flex',
     flex: 1,
     borderWidth: 1,

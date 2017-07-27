@@ -146,7 +146,8 @@ class TimeLineComponent extends React.Component {
     return (
 
       <View style={{display: 'flex', flexDirection: "row", flexWrap: 'nowrap'}}>
-        <TimeShifter/>
+        <TimeShifter timeLineId={this.props.timeLineId} day={this.props.startTime} start={this.props.startTime}
+        end={this.props.endTime} />
         <View style={styles.binContainer}>
           {bins}
         </View>

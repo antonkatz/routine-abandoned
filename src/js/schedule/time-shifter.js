@@ -1,56 +1,93 @@
 import React, {PureComponent} from "react";
 import {View} from 'react-native'
 import {minutesToDisplayTime} from '../display-helpers'
-import RaisedButton from 'material-ui/RaisedButton';
+import Slider from 'material-ui/Slider';
+import {connect} from 'react-redux'
+import {State} from '../redux/state'
 
-export default class TimeShifter extends PureComponent {
-  props: {start: Date, end: Date, currentPosition: Date}
+class TimeShifterComponent extends PureComponent {
+  props: {start: Date, end: Date, currentPosition: Date, day: Date}
 
   constructor() {
     super()
-    // gradations in minutes
-    this.gradations = [5, 10, 30, 60]
-    this.maxGradationMarks = 2
-
     this.state = {atGradation: null}
+    this.onSliderChange = this.onSliderChange.bind(this)
   }
 
-  getMarks() {
-
-    return [-5, 5]
+  getMin() {
+    return (this.props.start.valueOf() - this.props.currentPosition.valueOf()) / 1000 / 60
   }
 
-  // shift start / shift end vs move / change duration
+  getMax() {
+    return (this.props.end.valueOf() - this.props.currentPosition.valueOf()) / 1000 / 60
+  }
+
+  onSliderChange(event, value) {
+    console.log(value)
+  }
+
 
   render() {
-    const marks = this.getMarks().map(m => {
-      return (<RaisedButton style={styles.mark} key={m} label={m} fullWidth={true} primary={true}
-                            overlayStyle={{display: 'flex', alignItems: 'center', justifyContent: "center"}}
-                            labelStyle={{padding: 0}}/>)
-    })
-
+    if (!this.props.isActive) {
+      return null
+    }
     return (
-      <View style={styles.outerContainer}>
-        {marks}
+      <View style={styles.paper}>
+        <Slider axis="y" style={styles.slider} sliderStyle={{margin: 0}} max={this.getMax()} min={this.getMin()} defaultValue={0}
+        onChange={this.onSliderChange}/>
       </View>
     )
   }
 }
 
+
+function mapStateToProps(state: State, ownProps) {
+  let isActive = false
+  let currentPosition = null
+
+  if (state.appState.editEventMode.action && state.appState.editEventMode.action.startsWith('shift')) {
+    const event = state.appState.events.find(e => (e.id === state.appState.editEventMode.eventId))
+    if (state.appState.editEventMode.action.endsWith('top')) {
+      currentPosition = event.dateTimeStart
+    } else {
+      currentPosition = event.dateTimeEnd
+    }
+    console.log("timeshifter event", currentPosition, event)
+    // console.log("timeshifter", ownProps)
+    if (!ownProps.timeLineId) {
+      isActive = event.dateTimeStart.toDateString() === ownProps.day.toDateString()
+    } else {
+      let activeTimeLine = state.appState.additionalTimeLines.find(t => (t.parentEventId === state.appState.editEventMode.eventId))
+      isActive = activeTimeLine === ownProps.timeLineId
+    }
+  }
+
+  return Object.assign({}, ownProps, {isActive: isActive, currentPosition: currentPosition})
+}
+
+function mapDispatchToProps(dispatch) {
+  return {
+
+  }
+}
+
+const TimeShifter = connect(mapStateToProps, mapDispatchToProps)(TimeShifterComponent)
+export default TimeShifter
+
 const styles = {
-  outerContainer: {
+  paper: {
     display: 'flex',
     flexDirection: 'column',
     flexWrap: 'nowrap',
     width: '2em',
-    justifyContent: "space-evenly"
+    justifyContent: "flex-start",
+    alignItems: 'center'
   },
-  mark: {
-    // borderRightStyle: 'solid',
-    // borderRightColor: 'blue',
-    // borderRightWidth: 1,
-    maxHeight: '2em',
+  slider: {
     flexGrow: 1,
-    flexShrink: 1
+    flexShrink: 1,
+    height: 1,
+    paddingTop: 10,
+    paddingBottom: 10
   }
 }

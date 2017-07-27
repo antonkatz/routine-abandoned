@@ -3,7 +3,7 @@
 import {State} from '../redux/state'
 import {Action} from '../redux/actions'
 import {initializeState, processEventsIntoState, createPlan} from './schedule-data-logic'
-import {expandEvent, registerEventDom, enterCreatePlanMode} from './schedule-display-logic'
+import {expandEvent, registerEventDom, enterCreatePlanMode, startShiftPlanEdge} from './schedule-display-logic'
 
 export const SCHEDULE_ACTION_PREFIX = "SCHEDULE_"
 
@@ -20,6 +20,10 @@ export const REGISTER_EVENT_DOM = SCHEDULE_ACTION_PREFIX + "REGISTER_EVENT_DOM"
 export const ENTER_CREATE_PLAN_MODE = SCHEDULE_ACTION_PREFIX + "ENTER_CREATE_PLAN_MODE"
 
 export const CREATE_PLAN = SCHEDULE_ACTION_PREFIX + "CREATE_PLAN"
+
+export const START_SHIFT_PLAN_EDGE = SCHEDULE_ACTION_PREFIX + "START_SHIFT_PLAN_EDGE"
+
+// export const
 
 export function initializeAction() {
   return {type: INITIALIZE_SCHEDULE_ACTION}
@@ -43,6 +47,9 @@ export function enterCreatePlanModeAction(routineId) {
 export function createPlanAction(time: Date, timeLineId) {
   return {type: CREATE_PLAN, time: time, timeLineId: timeLineId}
 }
+export function startShiftPlanEdgeAction(eventId, shiftEdge) {
+  return {type: START_SHIFT_PLAN_EDGE, eventId: eventId, shiftEdge: shiftEdge}
+}
 
 export const scheduleReducer = (state: State, action: Action): Array<State.appState> => {
   switch (action.type) {
@@ -59,6 +66,10 @@ export const scheduleReducer = (state: State, action: Action): Array<State.appSt
       const newStateCem = enterCreatePlanMode(state, action.routineId)
       console.log(ENTER_CREATE_PLAN_MODE, newStateCem)
       return newStateCem
+    case START_SHIFT_PLAN_EDGE:
+      const statesspe = startShiftPlanEdge(state, action.eventId, action.shiftEdge)
+      console.log(START_SHIFT_PLAN_EDGE, statesspe, action)
+      return statesspe
     default:
       (action: empty)
       return state.appState

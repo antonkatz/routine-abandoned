@@ -104,7 +104,7 @@ export default function RoutinesDisplay(props) {
     </View>;
 
   return (
-    <View key="routines-list-holder" style={styles.outerContainer}>
+    <View key="routines-list-holder" style={styles.paper}>
       {props.parentRoutine && parentCardView}
       <View style={styles.routinesList}>
       {[
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   parentCardContainer: {
     flex: 1,
   },
-  outerContainer: {
+  paper: {
     display: 'flex',
     flexDirection: 'column'
   },

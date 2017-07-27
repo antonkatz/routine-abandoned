@@ -307,5 +307,12 @@ export function createPlan(state: State, time: Date, timeLineId) {
       repetition
   ]}
 
-  return Object.assign({}, state, {plans: [...state.plans, newPlan]})
+  const newAppState = Object.assign({}, state.appState, {createPlanMode: {
+    on: false,
+    routineId: null
+  }});
+
+  return Object.assign({}, state, {plans: [...state.plans, newPlan], appState: newAppState})
 }
+
+// export function shiftPlanEdge(state: State, event)

@@ -16,7 +16,7 @@ export function expandEvent(state: State, eventId, timeLineId): State.appState {
   }
 
   // push a new one
-  const event: Event = state.appState.events.find(e => (e.id === eventId))
+  let event: Event = state.appState.events.find(e => (e.id === eventId))
   // can happen in case of free time events, or alternative events
   if (!event) {
     return state.appState
@@ -31,7 +31,11 @@ export function expandEvent(state: State, eventId, timeLineId): State.appState {
 
     timeLines.push(nextTimeLine)
   }
-  const appState = Object.assign({}, state.appState, {additionalTimeLines: timeLines})
+
+
+  let newEvents = [...state.appState.events]
+  newEvents.splice(newEvents.indexOf(event), 1, Object.assign({}, event, {editMode: true}))
+  const appState = Object.assign({}, state.appState, {additionalTimeLines: timeLines, events: newEvents})
   return appState
 }
 
@@ -64,4 +68,13 @@ export function registerEventDom(state: State, eventId, dom, remove) {
 
 export function enterCreatePlanMode(state, routineId) {
   return Object.assign({}, state.appState, {createPlanMode: {on: true, routineId: routineId}})
+}
+
+export function startShiftPlanEdge(state: State, eventId, shiftEdge) {
+  const editEventMode = Object.assign({}, state.appState.editEventMode, {
+    action: 'shift-' + shiftEdge,
+    eventId: eventId,
+    shiftBy: 0
+  })
+  return Object.assign({}, state.appState, {editEventMode: editEventMode})
 }

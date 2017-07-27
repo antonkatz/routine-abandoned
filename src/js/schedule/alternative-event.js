@@ -17,7 +17,7 @@ type Props = {
 
 const AlternativeEventComponent = (props: Props) => {
   return (
-    <View style={styles.outerContainer}>
+    <View style={styles.paper}>
       <View style={styles.iconContainer}>
         <Icon/>
       </View>
@@ -40,7 +40,7 @@ const AlternativeEvent = connect((state, ownProps) => (ownProps), mapDispatchToP
 export default AlternativeEvent
 
 const styles = StyleSheet.create({
-  outerContainer: {
+  paper: {
     flexDirection: 'row',
     flexWrap: 'nowrap'
   },
