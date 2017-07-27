@@ -4,7 +4,6 @@
 
 import type {State, Plan, Routine, PlanRepetition, WeeklyPlanRepetition} from '../redux/state'
 import type {RoutineColor} from '../color-constants'
-import Schedule from './schedule'
 import { connect } from 'react-redux'
 import {Event, AlternativeEvents, SingleEvent} from './schedule-types-constants'
 import {getRoutineChildrenOrRoot, filterEventsByDate, getDurationInMinutes, getDateWithSetTime} from '../helpers'
@@ -286,14 +285,3 @@ function getColor(plan: Plan, routineFinder): RoutineColor {
   const c = plan.color ? plan.color : routineFinder(plan.parentRoutineId).color
   return c ? c : DEFAULT_ROUTINE_COLOR
 }
-
-
-/* Redux */
-
-function mapStateToProps(state: State) {
-  return {}
-}
-
-const ConnectedSchedule = connect(mapStateToProps)(Schedule)
-
-export default ConnectedSchedule

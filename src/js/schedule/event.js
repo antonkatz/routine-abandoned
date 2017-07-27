@@ -20,6 +20,14 @@ class EventComponent extends Component {
     this.props.onMount(this.props.id, ReactDOM.findDOMNode(this))
   }
 
+  compoenentDidUpdate() {
+    this.props.onMount(this.props.id, ReactDOM.findDOMNode(this))
+  }
+
+  componentWillUnmount() {
+    this.props.onUnmount(this.props.id, ReactDOM.findDOMNode(this))
+  }
+
   render() {
     return (
       <View style={styles.outerContainer}>
@@ -42,7 +50,10 @@ function mapDispatchToProps(dispatch) {
       dispatch(expandEventAction(eventId, timeLineId))
     },
     onMount: (eventId, dom) => {
-      dispatch(registerEventDomAction(eventId, dom))
+      dispatch(registerEventDomAction(eventId, dom, false))
+    },
+    onUnmount: (eventId, dom) => {
+      dispatch(registerEventDomAction(eventId, dom, true))
     }
   }
 }

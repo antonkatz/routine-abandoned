@@ -40,19 +40,28 @@ function getTimeLineOffsetToMatch(event: Event) {
   return Math.min(...offsets)
 }
 
-export function registerEventDom(state: State, eventId, dom) {
+
+// fixme. these will need to unregister as well
+export function registerEventDom(state: State, eventId, dom, remove) {
   let eventIndex = state.appState.events.findIndex(e => (e.id === eventId))
   if (eventIndex < 0) {
     return state.appState
   }
   const event = state.appState.events[eventIndex]
-  let domArray = [dom]
+  let domArray = []
+  if (!remove) {
+    domArray.push(dom)
+  }
   if (event.dom) {
-    domArray = [...domArray, ...event.dom]
+    domArray = [...domArray, ...event.dom.filter(d => (d !== dom))]
   }
   const newEvent = Object.assign({}, state.appState.events[eventIndex], {dom: domArray})
   const events = [...state.appState.events]
   events.splice(eventIndex, 1, newEvent)
   const newState = Object.assign({}, state.appState, {events: events})
   return newState
+}
+
+export function enterCreateEventMode(state, routineId) {
+  return Object.assign({}, state.appState, {createEventMode: {on: true, routineId: routineId}})
 }

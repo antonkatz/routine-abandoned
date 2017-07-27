@@ -11,6 +11,7 @@ import {DEFAULT_ROUTINE_COLOR, getAvatarTextColor} from '../color-constants'
 import {minutesToDisplayTime} from '../display-helpers'
 import type {Goal, Routine} from '../redux/state'
 import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton';
 import Divider from 'material-ui/Divider';
 import Subheader from 'material-ui/Subheader';
 
@@ -20,25 +21,30 @@ import Subheader from 'material-ui/Subheader';
  * a full blown routine
 * */
 
-function displaySingleRoutine(r: Routine, navigateDown) {
+function displaySingleRoutine(r: Routine, navigateDown, onSchedule) {
   const bgColor = r.color || DEFAULT_ROUTINE_COLOR;
   return (
-    <Card key={r.id} expandable={true} onExpandChange={() => navigateDown(r)}>
+  <View style={styles.card} key={r.id}>
+    <Card expandable={true} expanded={false} onExpandChange={() => navigateDown(r)}>
       <CardHeader title={r.title} subtitle={r.description ? r.description : ""}
                   actAsExpander showExpandableButton avatar={
         <Avatar backgroundColor={bgColor} color={getAvatarTextColor(bgColor)}>
           {r.title.length > 0 ? r.title.charAt(0) : ""}
         </Avatar>
       }/>
-      <CardText actAsExpander>
+      <CardText actAsExpander style={{paddingTop: 0, paddingBottom: 0}}>
         {displayGoals(r)}
         {r.defaultDuration && <Chip key="def-dur">usually lasts {minutesToDisplayTime(r.defaultDuration)}</Chip>}
       </CardText>
+      <CardActions>
+        <FlatButton label="Schedule" onTouchTap={() => {onSchedule(r.id)}} primary={true} />
+      </CardActions>
     </Card>
+  </View>
   )
 }
 
-function dispalyParentRoutine(r: Routine, navigateUp) {
+function displayParentRoutine(r: Routine, navigateUp, onSchedule) {
   const bgColor = r.color || DEFAULT_ROUTINE_COLOR;
   return (
     <Card key={r.id} initiallyExpanded={true} showExpandableButton={false} expandable={false} style={{marginBottom: '10px'}}>
@@ -52,17 +58,9 @@ function dispalyParentRoutine(r: Routine, navigateUp) {
       </CardText>
       <CardActions>
         <FlatButton label="Back" onTouchTap={navigateUp} />
+        <FlatButton label="Schedule" onTouchTap={() => {onSchedule(r.id)}} primary={true} />
       </CardActions>
     </Card>
-  )
-}
-
-function displaySubRoutineActions(r: Routine, navigateDown: (Routine) => void) {
-  return (
-  <CardActions>
-    <FlatButton label="Sub-routines" onTouchTap={() => {navigateDown(r)}} />
-    <FlatButton label="Edit" onTouchTap={() => {}} />
-  </CardActions>
   )
 }
 
@@ -89,31 +87,38 @@ function displayGoalChip(interval: string, minutes: ?number) {
     )
 }
 
-function displayRoutinesList(routines: Array<Routine>, navigateDown: (r: Routine) => void) {
+function displayRoutinesList(routines: Array<Routine>, navigateDown: (r: Routine) => void, onSchedule) {
   return routines.map(r => {
-    //displaySubRoutineActions(r,navigateDown)
-    return displaySingleRoutine(r, navigateDown)
+    return displaySingleRoutine(r, navigateDown, onSchedule)
   })
 }
 
 export default function RoutinesDisplay(props) {
-  const parentCard = props.parentRoutine && dispalyParentRoutine(props.parentRoutine, props.navigation.up)
-    return (
-      <View key="routines-list-holder">
-        {[
-          parentCard,
-          ...displayRoutinesList(props.routineChildren, props.navigation.down)]
-        }
+  const parentCard = props.parentRoutine && displayParentRoutine(props.parentRoutine, props.navigation.up, props.onSchedule)
+  const parentCardView =
+    <View style={styles.parentCardContainer}>
+      {parentCard}
+      <View>
+        <RaisedButton primary={true} label="Create routine"/>
       </View>
-    )
+    </View>;
+
+  return (
+    <View key="routines-list-holder" style={styles.outerContainer}>
+      {props.parentRoutine && parentCardView}
+      <View style={styles.routinesList}>
+      {[
+        ...displayRoutinesList(props.routineChildren, props.navigation.down, props.onSchedule)
+      ]}
+      </View>
+    </View>
+  )
 }
-
-//               <Button key='button' title="add routine" onPress={() => props.onAddClick(props.parentId)}></Button>,
-
 
 const styles = StyleSheet.create({
   card: {
-    flex: 1,
+    flexGrow: 1,
+    flexShrink: 1
   },
   chipContainer: {
     flex: 1,
@@ -124,13 +129,14 @@ const styles = StyleSheet.create({
   chip: {
     flex: 1,
   },
-  container: {
+  parentCardContainer: {
     flex: 1,
-    // backgroundColor: 'black'
-    // alignSelf: 'flex-start'
   },
-  innerContainer: {
-    // flexWrap: 'no-wrap',
-    // flexDirection: 'column'
+  outerContainer: {
+    display: 'flex',
+    flexDirection: 'column'
+  },
+  routinesList : {
+    flexDirection: 'row'
   }
 })

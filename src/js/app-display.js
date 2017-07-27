@@ -5,12 +5,11 @@
 
 import React from "react";
 import {ScrollView, StyleSheet, Text, View} from "react-native";
-import Schedule from "./schedule/schedule-data-logic";
+import Schedule from "./schedule/schedule";
 import {VIEW_SCHEDULE_PATH} from "./navigation/constants";
 import {Link, Route, Router} from "./navigation/nav-import";
 import {OpenRoutines} from "./routines/routines-controls";
 import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
-// import Routines from './routines/routines-bindings'
 import Routines from './routines/routines-bindings'
 import {VIEW_ROUTINES_PATH} from './navigation/constants'
 import bgImage from '../images/seamless_paper_texture.png'

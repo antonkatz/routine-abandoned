@@ -30,13 +30,13 @@ const TimeBinComponent = (props: {text: string, children: any, style: ?any}) => 
   if (props.style) {
     fullStyle.push(props.style)
   }
-  // const icon = <Icon style={{height: "1em", width: "auto"}}/>
+  const icon = <Icon style={{height: "1em", width: "auto"}}/>
   return (
     <View style={fullStyle}>
-      {/*<View style={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', justifyContent: "space-between", alignItems: 'flex-end'}}>*/}
+      <View style={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', justifyContent: "space-between", alignItems: 'flex-end'}}>
         <Text>{props.text}</Text>
-        {/*<FlatButton icon={icon} primary={true} style={{flexGrow: 0, flexShrink: 1, minWidth: 0, height: 'auto', lineHeight: 'unset'}}/>*/}
-      {/*</View>*/}
+        {props.createEventMode && <RaisedButton icon={icon} primary={true} style={{flexGrow: 0, flexShrink: 1, minWidth: 0, height: 'auto', lineHeight: 'unset'}}/>}
+      </View>
       <View>
         {props.children}
       </View>
@@ -45,7 +45,8 @@ const TimeBinComponent = (props: {text: string, children: any, style: ?any}) => 
 }
 
 function mapStateToProps(state: State, ownProps) {
-  return ownProps
+  const props = Object.assign({}, ownProps, {createEventMode: state.appState.createEventMode.on})
+  return props
 }
 
 function mapDispatchToProps(dispatch) {

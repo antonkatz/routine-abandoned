@@ -23,6 +23,8 @@ import ReactDOM from 'react-dom';
 import RaisedButton from 'material-ui/RaisedButton';
 import TimeBin from "./time-bin"
 import AddIcon from 'material-ui/svg-icons/content/add';
+import { withRouter } from 'react-router'
+
 
 export type TimeLineProps = {
   startTime: Date, endTime: Date, events: Array<Event>, routines: Array<Routine>, timeLineId: ?number
@@ -33,26 +35,27 @@ class TimeLineComponent extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = {now: new Date(), setIntervalId: null, offsetBy: 0}
+    this.state = {now: new Date(), setIntervalId: null}
   }
 
   componentDidMount() {
     if (this.props.isCurrent) {
       this.interval = setInterval(() => {
         this.setState((old) => (Object.assign({}, old, {now: new Date()})))
-      }, 1000 * 60)
+      }, 1000 * 1)
     }
     if (this.props.matchOffset) {
       const elem = ReactDOM.findDOMNode(this)
       const selfOffset = elem.getBoundingClientRect().top
       const offsetBy = this.props.matchOffset - selfOffset
       elem.style.top = "calc(" + offsetBy + "px - 1em)"
-      this.setState(Object.assign({}, this.state, {offsetBy: offsetBy}))
     }
   }
 
   componentWillUnmount() {
-    this.interval = false
+    if (this.interval) {
+      clearInterval(this.interval)
+    }
   }
 
   getStartTime(): Date {
@@ -153,7 +156,7 @@ function mapStateToProps(state: State, ownProps) {
   return Object.assign({}, ownProps, {events: [...withAlternatives, ...freeTime]})
 }
 
-const TimeLine = connect(mapStateToProps)(TimeLineComponent)
+const TimeLine = withRouter(connect(mapStateToProps)(TimeLineComponent))
 export default TimeLine
 
 const styles = StyleSheet.create({

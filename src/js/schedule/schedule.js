@@ -5,8 +5,10 @@
 import React, {PureComponent} from "react";
 import {View, StyleSheet, Text} from "react-native";
 import Week from './week.js'
+import { connect } from 'react-redux'
+import { withRouter } from 'react-router'
 
-export default class Schedule extends PureComponent {
+class Schedule extends PureComponent {
   render() {
     return (
        <View style={styles.container}>
@@ -15,6 +17,15 @@ export default class Schedule extends PureComponent {
     )
   }
 }
+
+
+function mapStateToProps(state: State) {
+  return {}
+}
+
+const ConnectedSchedule = withRouter(connect(mapStateToProps)(Schedule))
+
+export default ConnectedSchedule
 
 const styles = StyleSheet.create({
   container: {
