@@ -1,10 +1,18 @@
 //@flow
 
 export function minutesToDisplayTime(minutes: number): string {
-  const fullHours = Math.floor(minutes / 60)
-  const leftOverMinutes = minutes % 60
-  const hoursStr = fullHours >= 1 ? fullHours + "h " : ""
-  return hoursStr + leftOverMinutes + "min"
+  // const negative = minutes < 0
+  const fullHours = Math.floor(Math.abs(minutes) / 60)
+  const leftOverMinutes = Math.abs(minutes) % 60
+  const hoursStr = fullHours >= 1 ? fullHours + "h" : ""
+  let fullStr = hoursStr
+  if (leftOverMinutes > 0) {
+    fullStr = fullStr + " " + leftOverMinutes + "min"
+  }
+  // if (negative) {
+  //   fullStr = "-" + fullStr
+  // }
+  return fullStr
 }
 
 export function dayOfWeekToText(day: number): string {

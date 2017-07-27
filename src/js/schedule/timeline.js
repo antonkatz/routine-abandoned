@@ -25,7 +25,7 @@ import TimeBin from "./time-bin"
 import AddIcon from 'material-ui/svg-icons/content/add';
 import { withRouter } from 'react-router'
 import {createPlanAction} from './schedule-reducers-actions'
-
+import TimeShifter from './time-shifter'
 
 export type TimeLineProps = {
   startTime: Date, endTime: Date, events: Array<Event>, routines: Array<Routine>, timeLineId: ?number
@@ -144,8 +144,12 @@ class TimeLineComponent extends React.Component {
     }
 
     return (
-      <View style={styles.binContainer}>
-        {bins}
+
+      <View style={{display: 'flex', flexDirection: "row", flexWrap: 'nowrap'}}>
+        <TimeShifter/>
+        <View style={styles.binContainer}>
+          {bins}
+        </View>
       </View>
     )
 
