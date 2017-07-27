@@ -67,11 +67,6 @@ export type State = {
       on: boolean,
       routineId: ?number
     },
-    +editEventMode: {
-      action: boolean,
-      eventId: string,
-      shiftBy: ?number
-    }
   },
   +settings: {
     dayLimits: {start: TimePoint, end: TimePoint}
@@ -92,14 +87,9 @@ export const testData: State = {
     events: [],
     additionalTimeLines: [],
     createPlanMode: {
-      on: true,
-      routineId: 2
+      on: false,
+      routineId: null
     },
-    editEventMode: {
-      action: null,
-      eventId: null,
-      shiftBy: null
-    }
   },
   settings: {
     dayLimits: {start: {hour: 5, minute: 0}, end: {hour: 20, minute: 30}}

@@ -24,8 +24,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 import TimeBin from "./time-bin"
 import AddIcon from 'material-ui/svg-icons/content/add';
 import { withRouter } from 'react-router'
-import {createPlanAction} from './schedule-reducers-actions'
-import TimeShifter from './time-shifter'
+import {createPlanAction, moveEventAction} from './schedule-reducers-actions'
+import TimePicker from 'material-ui/TimePicker';
 
 export type TimeLineProps = {
   startTime: Date, endTime: Date, events: Array<Event>, routines: Array<Routine>, timeLineId: ?number
@@ -36,7 +36,7 @@ class TimeLineComponent extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = {now: new Date()}
+    this.state = {now: new Date(), offsetBy: 0}
   }
 
   componentDidMount() {
@@ -49,7 +49,8 @@ class TimeLineComponent extends React.Component {
       const elem = ReactDOM.findDOMNode(this)
       const selfOffset = elem.getBoundingClientRect().top
       const offsetBy = this.props.matchOffset - selfOffset
-      elem.style.top = "calc(" + offsetBy + "px - 1em)"
+      // elem.style.top = "calc(" + offsetBy + "px - 1em)"
+      this.setState({offsetBy: offsetBy})
     }
   }
 
@@ -84,6 +85,11 @@ class TimeLineComponent extends React.Component {
   }
 
   render() {
+
+    if (this.props.timeLineId) {
+      console.log("timeline with id render", this.props.startTime, this.props.endTime)
+    }
+
     // slitting an event into two, for display purposes (showing current time marker)
     const now = this.state.now
     const events = [...this.props.events]
@@ -109,6 +115,7 @@ class TimeLineComponent extends React.Component {
       sortedRoutines = this.props.routines
     }
 
+    let first = true
     const bins = []
     for (let i = 0; i < timePoints.length - 1; i++) {
       const start = timePoints[i]
@@ -116,9 +123,12 @@ class TimeLineComponent extends React.Component {
       const eventsInBin = sortedEvents.filter(e => (e.dateTimeStart.valueOf() >= start.valueOf() &&
       e.dateTimeEnd <= end.valueOf()))
       const isNow = start.valueOf() <= now.valueOf() && end.valueOf() > now.valueOf()
+
       bins.push(
         <TimeBin style={isNow ? styles.nowBin : null} key={start.valueOf() + "" + end.valueOf()}
-        text={displayTimePoint(start)} onCreateNew={this.props.onCreateNew(start)}>
+                 text={displayTimePoint(start)}
+                 displayTimePicker={first && this.props.timeLineId} time={start} onTimePick={this.props.onMoveEvent}
+                 onCreateNew={this.props.onCreateNew(start)}>
             {eventsInBin.map(e => {
               if (e.type === 'single') {
                 return <Event key={e.id} {...e} timeLineId={this.props.timeLineId}/>
@@ -128,9 +138,12 @@ class TimeLineComponent extends React.Component {
             })}
         </TimeBin>
       )
+
+      first = false
     }
     bins.push(
-      <TimeBin key="end-of-day" text={displayTimePoint(timePoints[timePoints.length-1])} />
+      <TimeBin key="end-of-day" text={displayTimePoint(timePoints[timePoints.length-1])}
+               displayTimePicker={this.props.timeLineId} time={timePoints[timePoints.length-1]} />
     )
 
     if (sortedRoutines.length > 0) {
@@ -144,14 +157,10 @@ class TimeLineComponent extends React.Component {
     }
 
     return (
-
-      <View style={{display: 'flex', flexDirection: "row", flexWrap: 'nowrap'}}>
-        <TimeShifter timeLineId={this.props.timeLineId} day={this.props.startTime} start={this.props.startTime}
-        end={this.props.endTime} />
         <View style={styles.binContainer}>
+          <View style={{height: this.state.offsetBy}}/>
           {bins}
         </View>
-      </View>
     )
 
   }
@@ -168,6 +177,9 @@ function mapDispatchToProps(dispatch, ownProps) {
   return {
     onCreateNew: (time: Date) => () => {
       dispatch(createPlanAction(time, ownProps.timeLineId))
+    },
+    onMoveEvent: (newTime) => {
+      dispatch(moveEventAction(ownProps.parentEventId, ownProps.timeLineId, newTime))
     }
   }
 }

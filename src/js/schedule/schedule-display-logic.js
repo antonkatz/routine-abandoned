@@ -69,12 +69,3 @@ export function registerEventDom(state: State, eventId, dom, remove) {
 export function enterCreatePlanMode(state, routineId) {
   return Object.assign({}, state.appState, {createPlanMode: {on: true, routineId: routineId}})
 }
-
-export function startShiftPlanEdge(state: State, eventId, shiftEdge) {
-  const editEventMode = Object.assign({}, state.appState.editEventMode, {
-    action: 'shift-' + shiftEdge,
-    eventId: eventId,
-    shiftBy: 0
-  })
-  return Object.assign({}, state.appState, {editEventMode: editEventMode})
-}

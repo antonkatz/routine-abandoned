@@ -5,14 +5,15 @@
 
 import React, {Component} from "react";
 import {View, StyleSheet, Text, TouchableHighlight} from "react-native";
-import {minutesToDisplayTime} from "../display-helpers"
+import {minutesToDisplayTime, displayTimePoint} from "../display-helpers"
 import TimeLine from './timeline'
 import {DEFAULT_ROUTINE_COLOR} from '../color-constants'
 import {Event as EventType} from './schedule-types-constants'
 import {connect} from 'react-redux'
-import {expandEventAction, registerEventDomAction, startShiftPlanEdgeAction} from './schedule-reducers-actions'
+import {expandEventAction, registerEventDomAction, moveEventAction} from './schedule-reducers-actions'
 import ReactDOM from 'react-dom';
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 
 class EventComponent extends Component {
   props: EventType
@@ -46,19 +47,8 @@ class EventComponent extends Component {
   }
 
   render() {
-    let topShiftButton = <RaisedButton label="Shift start" onTouchTap={this.props.onStartShift(this.props.id, 'top')} primary={true}/>
-    let bottomShiftButton = <RaisedButton label="Shift end" onTouchTap={this.props.onStartShift(this.props.id, 'bottom')} primary={true}/>
-
-    if (this.props.shiftTop) {
-      topShiftButton = <RaisedButton label="Cancel" secondary={true}/>
-    }
-    if (this.props.shiftBottom) {
-      bottomShiftButton = <RaisedButton label="Cancel" secondary={true}/>
-    }
-
     return (
       <View>
-        {this.state.expanded && topShiftButton}
         <View style={styles.paper}>
           <View
             style={[styles.colorBar, {backgroundColor: this.props.color ? this.props.color : DEFAULT_ROUTINE_COLOR}]}></View>
@@ -69,31 +59,19 @@ class EventComponent extends Component {
             </View>
           </TouchableHighlight>
         </View>
-        {this.state.expanded && bottomShiftButton}
       </View>
     )
   }
 }
 
 function mapStateToProps(state: State, ownProps) {
-  // const self = state.appState.events.find(e => (e.id === ownProps.id))
-  const action = state.appState.editEventMode.action
-  const activeEditMode = action && state.appState.editEventMode.eventId === ownProps.id
-  let editProps = {}
-  // console.log("event, props, shifting", action, activeEditMode, state.appState.editEventMode)
-  if (activeEditMode) {
-    editProps = {
-      shiftTop: action === 'shift-top',
-      shiftBottom: action === 'shift-bottom'
-    }
-  }
-  return Object.assign({}, ownProps, editProps)
+  return Object.assign({}, ownProps)
 }
 
 function mapDispatchToProps(dispatch) {
   return {
     onStartShift: (eventId, shiftEdge) => () => {
-      dispatch(startShiftPlanEdgeAction(eventId, shiftEdge))
+      dispatch(moveEventAction(eventId, shiftEdge))
     },
     onToggleExpand: (eventId, timeLineId) => {
       dispatch(expandEventAction(eventId, timeLineId))

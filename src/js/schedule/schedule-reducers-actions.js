@@ -2,8 +2,8 @@
 
 import {State} from '../redux/state'
 import {Action} from '../redux/actions'
-import {initializeState, processEventsIntoState, createPlan} from './schedule-data-logic'
-import {expandEvent, registerEventDom, enterCreatePlanMode, startShiftPlanEdge} from './schedule-display-logic'
+import {initializeState, processEventsIntoState, createPlan, moveEvent} from './schedule-data-logic'
+import {expandEvent, registerEventDom, enterCreatePlanMode} from './schedule-display-logic'
 
 export const SCHEDULE_ACTION_PREFIX = "SCHEDULE_"
 
@@ -21,7 +21,7 @@ export const ENTER_CREATE_PLAN_MODE = SCHEDULE_ACTION_PREFIX + "ENTER_CREATE_PLA
 
 export const CREATE_PLAN = SCHEDULE_ACTION_PREFIX + "CREATE_PLAN"
 
-export const START_SHIFT_PLAN_EDGE = SCHEDULE_ACTION_PREFIX + "START_SHIFT_PLAN_EDGE"
+export const MOVE_EVENT = SCHEDULE_ACTION_PREFIX + "MOVE_EVENT"
 
 // export const
 
@@ -47,8 +47,8 @@ export function enterCreatePlanModeAction(routineId) {
 export function createPlanAction(time: Date, timeLineId) {
   return {type: CREATE_PLAN, time: time, timeLineId: timeLineId}
 }
-export function startShiftPlanEdgeAction(eventId, shiftEdge) {
-  return {type: START_SHIFT_PLAN_EDGE, eventId: eventId, shiftEdge: shiftEdge}
+export function moveEventAction(eventId, timeLineId, newTime) {
+  return {type: MOVE_EVENT, eventId: eventId, timeLineId: timeLineId, newTime: newTime}
 }
 
 export const scheduleReducer = (state: State, action: Action): Array<State.appState> => {
@@ -57,6 +57,7 @@ export const scheduleReducer = (state: State, action: Action): Array<State.appSt
       return initializeState(state.appState);
     case PROCESS_EVENTS_INTO_STATE:
       const newState = processEventsIntoState(state, action.rootEventId)
+      console.log(PROCESS_EVENTS_INTO_STATE, newState)
       return newState
     case EXPAND_EVENT:
       return expandEvent(state, action.eventId, action.timeLineId)
@@ -66,10 +67,6 @@ export const scheduleReducer = (state: State, action: Action): Array<State.appSt
       const newStateCem = enterCreatePlanMode(state, action.routineId)
       console.log(ENTER_CREATE_PLAN_MODE, newStateCem)
       return newStateCem
-    case START_SHIFT_PLAN_EDGE:
-      const statesspe = startShiftPlanEdge(state, action.eventId, action.shiftEdge)
-      console.log(START_SHIFT_PLAN_EDGE, statesspe, action)
-      return statesspe
     default:
       (action: empty)
       return state.appState
@@ -84,6 +81,18 @@ export const scheduleReducerFullState = (state: State, action: Action): Array<St
       newStateCe = Object.assign({}, newStateCe, {appState: newAppState})
       console.log("create new plan reducer", newStateCe)
       return newStateCe
+    case MOVE_EVENT:
+      const stateme = moveEvent(state, action.eventId, action.newTime)
+      console.log(MOVE_EVENT, stateme, action)
+      const statepeis = processEventsIntoState(stateme)
+      // fixme! hack! event is not rendered so offset cannot be calculated for timeline. just close all instead.
+      const timeLineId = action.timeLineId ? action.timeLineId : 0
+      statepeis.additionalTimeLines = statepeis.additionalTimeLines.filter(t => {t.timeLineId < timeLineId})
+      return Object.assign({}, state, {appState: statepeis})
+
+      // let fullStatepeis = Object.assign({}, state, {appState: statepeis})
+      // console.log("events into state", fullStatepeis)
+      // const stateei = expandEvent(fullStatepeis, action.eventId, action.timeLineId)
     default:
       (action: empty)
       return state

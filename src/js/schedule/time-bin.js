@@ -23,18 +23,39 @@ import ReactDOM from 'react-dom';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import Icon from 'material-ui/svg-icons/content/add';
+import TimePicker from 'material-ui/TimePicker';
 
 
 const TimeBinComponent = (props: {text: string, children: any, style: ?any}) => {
+
+  if (props.displayTimePicker) {
+    console.log("bin with time picker", props.time)
+  }
+
   const fullStyle = [styles.bin]
   if (props.style) {
     fullStyle.push(props.style)
   }
   const icon = <Icon style={{height: "1em", width: "auto"}}/>
+
+  const onTimePick = (event, date) => {
+    props.onTimePick(date)
+  }
+
   return (
     <View style={fullStyle}>
       <View style={{display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', justifyContent: "space-between", alignItems: 'flex-end'}}>
-        <Text>{props.text}</Text>
+        {!props.displayTimePicker && <Text>{props.text}</Text>}
+        {props.displayTimePicker && <View>
+          <TimePicker
+            id={props.text}
+            autoOk={true}
+            format="24hr"
+            value={props.time}
+            onChange={onTimePick}
+          />
+        </View>}
+
         {props.createPlanMode && props.onCreateNew && <RaisedButton icon={icon} primary={true}
                                                                     style={{flexGrow: 0, flexShrink: 1, minWidth: 0, height: 'auto', lineHeight: 'unset'}}
                                                                     onTouchTap={props.onCreateNew}/>}

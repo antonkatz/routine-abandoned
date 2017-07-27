@@ -73,9 +73,9 @@ routineChildFinder: (id: number) => Array<Routine>): Array<Event> {
     const dates = getDates(p, events)
     dates.forEach(d => {
       let event: SingleEvent = {
-        id: '' + p.id + d.end.valueOf() + d.end.valueOf(),
+        id: '' + p.id + d.parentRepetitionId,
         parentPlanId: p.id,
-        parentRepetitionId: d.repetitionId,
+        parentRepetitionId: d.parentRepetitionId,
         parentEventId: d.parentEventId,
         isRoot: !p.parentPlanId,
         dateTimeStart: d.start,
@@ -315,4 +315,34 @@ export function createPlan(state: State, time: Date, timeLineId) {
   return Object.assign({}, state, {plans: [...state.plans, newPlan], appState: newAppState})
 }
 
-// export function shiftPlanEdge(state: State, event)
+export function moveEvent(state: State, eventId, newTime) {
+  const event = state.appState.events.find(e => (e.id === eventId))
+  const plan = state.plans.find(p => (p.id === event.parentPlanId))
+  const repetition = plan.repetition.find(r => (r.repetitionId === event.parentRepetitionId))
+
+  console.log("move", newTime, event, plan, repetition)
+
+  // final hour / minute cannot be less than 0
+  let hour = newTime.getHours() - event.dateTimeStart.getHours() + repetition.hour
+  let minute = newTime.getMinutes() - event.dateTimeStart.getMinutes() + repetition.minute
+  let totalChange = hour * 60 + minute
+  if (totalChange < 0) {
+    totalChange = 0
+  }
+  hour = Math.floor(totalChange / 60)
+  minute = totalChange % 60
+
+  console.log(hour, minute)
+
+  const newRepetition = Object.assign({}, repetition, {hour: hour, minute: minute})
+  const newRepetitions = plan.repetition.filter(r => (r !== repetition))
+  newRepetitions.push(newRepetition)
+  const newPlan = Object.assign({}, plan, {repetition: newRepetitions})
+  const newPlans = state.plans.filter(p => (p !== plan))
+  newPlans.push(newPlan)
+
+  console.log(newPlan)
+
+  return Object.assign({}, state, {plans: newPlans})
+
+}
