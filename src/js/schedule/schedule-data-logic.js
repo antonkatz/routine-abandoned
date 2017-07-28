@@ -315,26 +315,38 @@ export function createPlan(state: State, time: Date, timeLineId) {
   return Object.assign({}, state, {plans: [...state.plans, newPlan], appState: newAppState})
 }
 
-export function moveEvent(state: State, eventId, newTime) {
+export function moveEvent(state: State, eventId, edge, newTime) {
   const event = state.appState.events.find(e => (e.id === eventId))
   const plan = state.plans.find(p => (p.id === event.parentPlanId))
   const repetition = plan.repetition.find(r => (r.repetitionId === event.parentRepetitionId))
 
-  console.log("move", newTime, event, plan, repetition)
+  console.log("move", edge, newTime, event, plan, repetition)
 
-  // final hour / minute cannot be less than 0
-  let hour = newTime.getHours() - event.dateTimeStart.getHours() + repetition.hour
-  let minute = newTime.getMinutes() - event.dateTimeStart.getMinutes() + repetition.minute
-  let totalChange = hour * 60 + minute
-  if (totalChange < 0) {
-    totalChange = 0
+  let hour = repetition.hour
+  let minute = repetition.minute
+  let duration = repetition.duration
+  if (edge === 'top') {
+    // final hour / minute cannot be less than 0
+    hour = newTime.getHours() - event.dateTimeStart.getHours() + hour
+    minute = newTime.getMinutes() - event.dateTimeStart.getMinutes() + minute
+    let totalChange = hour * 60 + minute
+    if (totalChange < 0) {
+      totalChange = 0
+    }
+    hour = Math.floor(totalChange / 60)
+    minute = totalChange % 60
+  } else {
+    const totalChange = (newTime.getHours() - event.dateTimeEnd.getHours()) * 60 + (newTime.getMinutes() - event.dateTimeEnd.getMinutes())
+    duration += totalChange
+    if (duration < 0) {
+      duration = 0
+    }
+    if (duration > 24 * )
   }
-  hour = Math.floor(totalChange / 60)
-  minute = totalChange % 60
 
-  console.log(hour, minute)
+  console.log(hour, minute, duration, edge)
 
-  const newRepetition = Object.assign({}, repetition, {hour: hour, minute: minute})
+  const newRepetition = Object.assign({}, repetition, {hour: hour, minute: minute, duration: duration})
   const newRepetitions = plan.repetition.filter(r => (r !== repetition))
   newRepetitions.push(newRepetition)
   const newPlan = Object.assign({}, plan, {repetition: newRepetitions})

@@ -127,7 +127,7 @@ class TimeLineComponent extends React.Component {
       bins.push(
         <TimeBin style={isNow ? styles.nowBin : null} key={start.valueOf() + "" + end.valueOf()}
                  text={displayTimePoint(start)}
-                 displayTimePicker={first && this.props.timeLineId} time={start} onTimePick={this.props.onMoveEvent}
+                 displayTimePicker={first && this.props.timeLineId} time={start} onTimePick={this.props.onMoveEvent('top')}
                  onCreateNew={this.props.onCreateNew(start)}>
             {eventsInBin.map(e => {
               if (e.type === 'single') {
@@ -143,7 +143,8 @@ class TimeLineComponent extends React.Component {
     }
     bins.push(
       <TimeBin key="end-of-day" text={displayTimePoint(timePoints[timePoints.length-1])}
-               displayTimePicker={this.props.timeLineId} time={timePoints[timePoints.length-1]} />
+               displayTimePicker={this.props.timeLineId} time={timePoints[timePoints.length-1]}
+               onTimePick={this.props.onMoveEvent('bottom')}/>
     )
 
     if (sortedRoutines.length > 0) {
@@ -178,8 +179,8 @@ function mapDispatchToProps(dispatch, ownProps) {
     onCreateNew: (time: Date) => () => {
       dispatch(createPlanAction(time, ownProps.timeLineId))
     },
-    onMoveEvent: (newTime) => {
-      dispatch(moveEventAction(ownProps.parentEventId, ownProps.timeLineId, newTime))
+    onMoveEvent: (edge) => (newTime) => {
+      dispatch(moveEventAction(ownProps.parentEventId, edge, newTime))
     }
   }
 }

@@ -47,8 +47,8 @@ export function enterCreatePlanModeAction(routineId) {
 export function createPlanAction(time: Date, timeLineId) {
   return {type: CREATE_PLAN, time: time, timeLineId: timeLineId}
 }
-export function moveEventAction(eventId, timeLineId, newTime) {
-  return {type: MOVE_EVENT, eventId: eventId, timeLineId: timeLineId, newTime: newTime}
+export function moveEventAction(eventId, edge, newTime) {
+  return {type: MOVE_EVENT, eventId: eventId, newTime: newTime, edge: edge}
 }
 
 export const scheduleReducer = (state: State, action: Action): Array<State.appState> => {
@@ -82,17 +82,13 @@ export const scheduleReducerFullState = (state: State, action: Action): Array<St
       console.log("create new plan reducer", newStateCe)
       return newStateCe
     case MOVE_EVENT:
-      const stateme = moveEvent(state, action.eventId, action.newTime)
+      const stateme = moveEvent(state, action.eventId, action.edge, action.newTime)
       console.log(MOVE_EVENT, stateme, action)
       const statepeis = processEventsIntoState(stateme)
       // fixme! hack! event is not rendered so offset cannot be calculated for timeline. just close all instead.
       const timeLineId = action.timeLineId ? action.timeLineId : 0
       statepeis.additionalTimeLines = statepeis.additionalTimeLines.filter(t => {t.timeLineId < timeLineId})
       return Object.assign({}, state, {appState: statepeis})
-
-      // let fullStatepeis = Object.assign({}, state, {appState: statepeis})
-      // console.log("events into state", fullStatepeis)
-      // const stateei = expandEvent(fullStatepeis, action.eventId, action.timeLineId)
     default:
       (action: empty)
       return state
